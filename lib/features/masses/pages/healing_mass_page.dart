@@ -15,8 +15,9 @@ class HealingMassPage extends StatelessWidget {
       subtitle: 'Confiez à Dieu vos maladies, vos traitements et vos proches.',
       accentColor: Colors.green,
       massTitle: 'Messe pour la Santé et la Guérison',
-      requiresBeneficiary: false, // pas de défunt ici
+      requiresBeneficiary: false,
       lottieAsset: 'assets/lotties/healing.json',
+
     );
   }
 }

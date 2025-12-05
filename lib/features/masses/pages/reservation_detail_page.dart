@@ -85,6 +85,19 @@ class ReservationDetailPage extends StatelessWidget {
 
           const SizedBox(height: 14),
 
+          // Paroisse
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Paroisse :", style: TextStyle(fontSize: 16)),
+                        Text(r.paroisseName ?? "Non précisée",
+                            style: const TextStyle(fontSize: 16)),
+                      ],
+                    ),
+
+
+          const SizedBox(height: 14),
+
           // Pasteur
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

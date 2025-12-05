@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:messeconnect/core/constants/app_colors.dart';
 
+import '../theme/app_colors.dart';
+
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;

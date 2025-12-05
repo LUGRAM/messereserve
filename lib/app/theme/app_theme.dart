@@ -1,7 +1,7 @@
 // lib/app/theme/app_theme.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:messeconnect/core/constants/app_colors.dart';
+import 'package:messeconnect/app/theme/app_colors.dart';
 
 class AppTheme {
   static ThemeData light() {

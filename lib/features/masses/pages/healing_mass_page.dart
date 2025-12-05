@@ -16,7 +16,7 @@ class HealingMassPage extends StatelessWidget {
       accentColor: Colors.green,
       massTitle: 'Messe pour la Santé et la Guérison',
       requiresBeneficiary: false,
-      lottieAsset: 'assets/lotties/healing.json',
+      lottieAsset: 'assets/lottie/healing.json',
 
     );
   }

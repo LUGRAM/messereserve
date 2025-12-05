@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:messeconnect/features/masses/widgets/mass_stepper_form.dart';
 
+import '../../../app/theme/app_colors.dart';
+
 class MassDetailBasePage extends StatelessWidget {
   final String heroTag;
   final String imageAsset;
@@ -35,8 +37,8 @@ class MassDetailBasePage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFD32F2F),
-              Color(0xFFB71C1C),
+              AppColors.massRedTop,
+              AppColors.massRedBottom,
             ],
           ),
         ),
@@ -58,7 +60,7 @@ class MassDetailBasePage extends StatelessWidget {
             // OVERLAY SOMBRE
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.45),
+                color: Colors.black.withValues(alpha:0.45),
               ),
             ),
 

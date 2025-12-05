@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/core/constants/app_colors.dart';
 
+import '../../app/theme/app_colors.dart';
+
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -66,7 +68,7 @@ class _SplashPageState extends State<SplashPage> {
               Text(
                 'réserver vos messes sans vous déplacer',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary.withOpacity(0.9),
+                  color: AppColors.textPrimary.withValues(alpha: 0.9),
                 ),
               ),
             ],

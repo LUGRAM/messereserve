@@ -6,7 +6,6 @@ import 'package:messeconnect/app/router/transitions.dart';
 
 // Layouts
 import 'package:messeconnect/layouts/auth_layout.dart';
-import 'package:messeconnect/layouts/home_layout.dart';
 import 'package:messeconnect/layouts/mass_layout.dart';
 
 // Pages Auth
@@ -27,7 +26,11 @@ import 'package:messeconnect/features/masses/pages/requiem_mass_page.dart';
 
 import '../../features/masses/models/reservation_model.dart';
 import '../../features/masses/pages/reservation_detail_page.dart';
+import '../../features/navigation/main_navigation.dart';
 import '../../features/payments/pages/payment_choice_page.dart';
+import '../../features/payments/pages/payment_page.dart';
+import '../../features/profile/pages/profile_page.dart';
+import '../../features/support/pages/support_page.dart';
 
 final _rootNavKey = GlobalKey<NavigatorState>();
 
@@ -66,29 +69,29 @@ class AppRouter {
       // --------------------------
       // 2. HOME LAYOUT (avec gradient)
       // --------------------------
-            ShellRoute(
-              builder: (_, __, child) => HomeLayout(child: child),
-              routes: [
-                GoRoute(
-                  path: '/home',
-                  builder: (_, __) => const HomePage(),
-                ),
+      ShellRoute(
+        builder: (_, __, child) => MainNavigation(content: child),
+        routes: [
+          GoRoute(path: '/home', builder: (_, __) => const HomePage()),
+          GoRoute(path: '/payments', builder: (_, __) => const PaymentPage()),
+          GoRoute(path: '/support', builder: (_, __) => const SupportPage()),
+          GoRoute(path: '/profile', builder: (_, __) => const ProfilePage()),
 
-                // NOUVELLE ROUTE
-                GoRoute(
-                  path: '/reservations',
-                  builder: (_, __) => const ReservationsListPage(),
-                ),
+          GoRoute(
+            path: '/reservations',
+            builder: (_, __) => const ReservationsListPage(),
+          ),
 
-                GoRoute(
-                  path: '/reservation-detail',
-                  builder: (_, state) {
-                    final r = state.extra as ReservationModel;
-                    return ReservationDetailPage(reservation: r);
-                  },
-                ),
-              ],
-            ),
+          GoRoute(
+            path: '/reservation-detail',
+            builder: (_, state) {
+              final r = state.extra as ReservationModel;
+              return ReservationDetailPage(reservation: r);
+            },
+          ),
+        ],
+      ),
+
 
 
       // --------------------------

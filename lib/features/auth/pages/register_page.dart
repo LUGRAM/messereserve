@@ -8,6 +8,8 @@ import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/app/widgets/primary_button.dart';
 import 'package:messeconnect/core/constants/app_colors.dart';
 
+import '../../../app/theme/app_colors.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 

@@ -1,16 +1,11 @@
-import 'dart:async';
-
-import 'package:messeconnect/features/masses/models/reservation_request.dart';
-import 'package:messeconnect/features/masses/models/reservation_model.dart';
+import '../models/reservation_model.dart';
+import '../models/reservation_request.dart';
 
 class ReservationApi {
-  /// MOCK avant Laravel : simule un appel réseau
   static Future<Map<String, dynamic>> createReservation(
-      ReservationRequest req,
-      ) async {
-    await Future.delayed(const Duration(seconds: 2)); // simulate API latency
+      ReservationRequest req) async {
+    await Future.delayed(const Duration(seconds: 2));
 
-    // MOCK response comme Laravel renverra plus tard
     return {
       "success": true,
       "reference": "MC-${DateTime.now().millisecondsSinceEpoch}",
@@ -19,11 +14,8 @@ class ReservationApi {
     };
   }
 
-  // -------------------------------------------------------------
-  // MOCK GET /reservations
-  // -------------------------------------------------------------
   static Future<List<ReservationModel>> fetchReservations() async {
-    await Future.delayed(const Duration(seconds: 2)); // simulate latency
+    await Future.delayed(const Duration(seconds: 2));
 
     final mockData = [
       {
@@ -33,6 +25,7 @@ class ReservationApi {
         "time": "10:00",
         "status": "pending_validation",
         "pastor_name": "Père Alain Ndzeng",
+        "paroisse_name": "Paroisse Sainte-Marie"
       },
       {
         "reference": "MC-20250227-X9Z7T3",
@@ -41,6 +34,7 @@ class ReservationApi {
         "time": "14:00",
         "status": "paid",
         "pastor_name": null,
+        "paroisse_name": "Paroisse Saint-Michel"
       },
     ];
 

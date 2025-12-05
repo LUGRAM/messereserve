@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:messeconnect/features/masses/models/pastor_model.dart';
+import 'package:messeconnect/features/masses/models/paroisse_model.dart';
+import 'package:messeconnect/features/masses/models/mock_paroisses.dart';
+
 import 'package:messeconnect/features/masses/models/reservation_request.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
 import 'package:messeconnect/features/masses/pages/reservation_sent_page.dart';
@@ -26,7 +29,15 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
 
-  // --- Demandeur (toutes messes sauf requiem)
+  // --- Paroisse
+  ParoisseModel? _selectedParoisse;
+  final List<ParoisseModel> _paroissesList = mockParoisses;
+
+  // --- Messe
+  DateTime? _dateTime;
+  PastorModel? _selectedPastor;
+
+  // --- Demandeur
   final _nomCtrl = TextEditingController();
   final _prenomCtrl = TextEditingController();
   final _nationaliteCtrl = TextEditingController();
@@ -36,10 +47,6 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final _benefNomCtrl = TextEditingController();
   final _benefPrenomCtrl = TextEditingController();
   DateTime? _benefDateDeces;
-
-  // --- Messe
-  DateTime? _dateTime;
-  PastorModel? _selectedPastor;
 
   @override
   void dispose() {
@@ -51,6 +58,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
     _benefPrenomCtrl.dispose();
     super.dispose();
   }
+
+  // ---------------------------------------------------------------------------
+  // DECORATION & CONTAINERS
+  // ---------------------------------------------------------------------------
 
   Widget _fieldContainer({required Widget child}) {
     return Container(
@@ -66,7 +77,67 @@ class _MassStepperFormState extends State<MassStepperForm> {
     );
   }
 
-  // --- PICK DATE + TIME
+  InputDecoration _input(String hint) {
+    return InputDecoration(
+      border: InputBorder.none,
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.white70),
+
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      errorStyle: const TextStyle(height: 0, color: Colors.transparent),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // PICKERS
+  // ---------------------------------------------------------------------------
+
+  Future<void> _chooseParoisse() async {
+    final p = await showModalBottomSheet<ParoisseModel>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (_) {
+        return ListView(
+          children: _paroissesList.map((paroisse) {
+            return ListTile(
+              title: Text(paroisse.name),
+              subtitle: Text(paroisse.address),
+              trailing: const Icon(Icons.church),
+              onTap: () => Navigator.pop(context, paroisse),
+            );
+          }).toList(),
+        );
+      },
+    );
+
+    if (mounted && p != null) {
+      setState(() => _selectedParoisse = p);
+    }
+  }
+
+  Future<void> _choosePastor() async {
+    final p = await showModalBottomSheet<PastorModel>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (_) => const PastorSelector(),
+    );
+
+    if (mounted && p != null) {
+      setState(() => _selectedPastor = p);
+    }
+  }
+
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
 
@@ -77,8 +148,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       lastDate: now.add(const Duration(days: 365)),
     );
 
-    if (!mounted) return;
-    if (selectedDate == null) return;
+    if (!mounted || selectedDate == null) return;
 
     final selectedTime = await showTimePicker(
       context: context,
@@ -98,10 +168,8 @@ class _MassStepperFormState extends State<MassStepperForm> {
     });
   }
 
-  // --- PICK DATE DÉCÈS ---
   Future<void> _pickBenefDate() async {
     final now = DateTime.now();
-
     final picked = await showDatePicker(
       context: context,
       initialDate: now,
@@ -114,48 +182,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
     }
   }
 
-  // --- SELECT PASTOR ---
-  Future<void> _choosePastor() async {
-    final p = await showModalBottomSheet<PastorModel>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
-      builder: (_) => const PastorSelector(),
-    );
+  // ---------------------------------------------------------------------------
+  // STEPPER HEADER
+  // ---------------------------------------------------------------------------
 
-    if (mounted && p != null) {
-      setState(() => _selectedPastor = p);
-    }
-  }
-
-  // --- INPUT ---
-  InputDecoration _input(String hint) {
-    return InputDecoration(
-      border: InputBorder.none,
-      hintText: hint,
-      hintStyle: const TextStyle(color: Colors.white70),
-
-      // Empêche Flutter de dessiner une bordure d'erreur rose
-      errorBorder: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(14),
-      ),
-
-      // Empêche le texte d'erreur rouge de s'afficher
-      errorStyle: const TextStyle(
-        height: 0,           // pas d’espace
-        color: Colors.transparent, // texte caché
-      ),
-    );
-  }
-
-
-  // --- STEPPER HEADER ---
   Widget _buildStepHeader() {
     Widget stepCircle(int index, String label) {
       final active = _currentStep == index;
@@ -178,10 +208,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
             backgroundColor: bg,
             child: Text(
               steps[index],
-              style: TextStyle(
-                color: fg,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(color: fg, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 4),
@@ -205,9 +232,9 @@ class _MassStepperFormState extends State<MassStepperForm> {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          stepCircle(0, 'Messe'),
+          stepCircle(0, 'Infos'),
           line(_currentStep >= 1),
-          stepCircle(1, 'Infos'),
+          stepCircle(1, 'Identité'),
           line(_currentStep >= 2),
           stepCircle(2, 'Résumé'),
         ],
@@ -215,10 +242,35 @@ class _MassStepperFormState extends State<MassStepperForm> {
     );
   }
 
-  // --- STEP 0 : PASTEUR + DATE/HEURE ---
+  // ---------------------------------------------------------------------------
+  // STEP 0 : PAROISSE + PASTEUR + DATE/HEURE
+  // ---------------------------------------------------------------------------
+
   Widget _buildStep0() {
     return Column(
       children: [
+        // PAROISSE
+        _fieldContainer(
+          child: InkWell(
+            onTap: _chooseParoisse,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    _selectedParoisse == null
+                        ? "Choisir une paroisse (obligatoire)"
+                        : "Paroisse : ${_selectedParoisse!.name}",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                const Icon(Icons.church, color: Colors.white70),
+              ],
+            ),
+          ),
+        ),
+
+        // PASTEUR
         _fieldContainer(
           child: InkWell(
             onTap: _choosePastor,
@@ -238,6 +290,8 @@ class _MassStepperFormState extends State<MassStepperForm> {
             ),
           ),
         ),
+
+        // DATE & HEURE
         _fieldContainer(
           child: InkWell(
             onTap: _pickDateTime,
@@ -262,7 +316,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
     );
   }
 
-  // --- STEP 1 : INFOS DEMANDEUR / DÉFUNT ---
+  // ---------------------------------------------------------------------------
+  // STEP 1 : DONNÉES DEMANDEUR / DEFUNT
+  // ---------------------------------------------------------------------------
+
   Widget _buildStep1() {
     final isRequiem = widget.requiresBeneficiary;
 
@@ -346,7 +403,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
     );
   }
 
-  // --- STEP 2 : RÉSUMÉ ---
+  // ---------------------------------------------------------------------------
+  // STEP 2 : RÉSUMÉ
+  // ---------------------------------------------------------------------------
+
   Widget _buildStep2() {
     String fmtDT(DateTime? d) =>
         d == null
@@ -381,6 +441,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
     return Column(
       children: [
         row("Type de messe", widget.massTitle),
+        row("Paroisse", _selectedParoisse?.name ?? "Non précisée"),
         row("Date & heure", fmtDT(_dateTime)),
         row("Pasteur choisi", _selectedPastor?.name ?? "Non précisé"),
         const SizedBox(height: 8),
@@ -404,9 +465,20 @@ class _MassStepperFormState extends State<MassStepperForm> {
     );
   }
 
-  // --- SUBMIT ---
+  // ---------------------------------------------------------------------------
+  // SUBMIT()
+  // ---------------------------------------------------------------------------
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedParoisse == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Veuillez choisir une paroisse.")),
+      );
+      setState(() => _currentStep = 0);
+      return;
+    }
 
     if (_dateTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -424,6 +496,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       "${_dateTime!.year}-${_dateTime!.month}-${_dateTime!.day}",
       scheduledTime:
       "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
+      paroisseId: _selectedParoisse!.id,
     );
 
     if (!mounted) return;
@@ -458,7 +531,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
     }
   }
 
-  // --- BUTTONS ---
+  // ---------------------------------------------------------------------------
+  // BUTTONS
+  // ---------------------------------------------------------------------------
+
   Widget _buildButtons() {
     return Row(
       children: [
@@ -469,10 +545,8 @@ class _MassStepperFormState extends State<MassStepperForm> {
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
               ),
-              child: const Text(
-                "Précédent",
-                style: TextStyle(color: Colors.white),
-              ),
+              child: const Text("Précédent",
+                  style: TextStyle(color: Colors.white)),
             ),
           ),
         if (_currentStep > 0) const SizedBox(width: 12),
@@ -480,6 +554,12 @@ class _MassStepperFormState extends State<MassStepperForm> {
           child: ElevatedButton(
             onPressed: () {
               if (_currentStep == 0) {
+                if (_selectedParoisse == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Veuillez choisir une paroisse.")),
+                  );
+                  return;
+                }
                 setState(() => _currentStep = 1);
               } else if (_currentStep == 1) {
                 if (_formKey.currentState!.validate()) {
@@ -499,10 +579,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
             ),
             child: Text(
               _currentStep < 2 ? "Suivant" : "Envoyer",
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -512,8 +589,11 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
   @override
   Widget build(BuildContext context) {
-    Widget stepContent =
-    _currentStep == 0 ? _buildStep0() : _currentStep == 1 ? _buildStep1() : _buildStep2();
+    Widget stepContent = _currentStep == 0
+        ? _buildStep0()
+        : _currentStep == 1
+        ? _buildStep1()
+        : _buildStep2();
 
     return Form(
       key: _formKey,

@@ -1,16 +1,18 @@
 class ReservationRequest {
   final int massServiceId;
 
-  final String scheduledDate; // format YYYY-MM-DD
-  final String scheduledTime; // format HH:mm
+  final String scheduledDate; // YYYY-MM-DD
+  final String scheduledTime; // HH:mm
 
-  final int? pastorId;        // optionnel
-  final String? beneficiary;  // nom du défunt (requiem uniquement)
+  final int? pastorId;
+  final String? beneficiary;
+  final int paroisseId;       // obligatoire
 
   ReservationRequest({
     required this.massServiceId,
     required this.scheduledDate,
     required this.scheduledTime,
+    required this.paroisseId,
     this.pastorId,
     this.beneficiary,
   });
@@ -22,6 +24,7 @@ class ReservationRequest {
       "scheduled_time": scheduledTime,
       "pastor_id": pastorId,
       "beneficiary": beneficiary,
+      "paroisse_id": paroisseId
     };
   }
 }

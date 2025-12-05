@@ -5,6 +5,7 @@ class ReservationModel {
   final String time;
   final String status;
   final String? pastorName;
+  final String? paroisseName;
 
   ReservationModel({
     required this.reference,
@@ -13,16 +14,18 @@ class ReservationModel {
     required this.time,
     required this.status,
     this.pastorName,
+    this.paroisseName,
   });
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) {
     return ReservationModel(
-      reference: json["reference"],
-      massTitle: json["mass_title"],
-      date: json["date"],
-      time: json["time"],
-      status: json["status"],
+      reference: json["reference"] ?? "",
+      massTitle: json["mass_title"] ?? "",
+      date: json["date"] ?? "",
+      time: json["time"] ?? "",
+      status: json["status"] ?? "",
       pastorName: json["pastor_name"],
+      paroisseName: json["paroisse_name"],
     );
   }
 }

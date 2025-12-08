@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 
-import '../../payments/pages/payment_choice_page.dart';
 
 class ReservationDetailPage extends StatelessWidget {
   final ReservationModel reservation;

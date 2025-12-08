@@ -1,8 +1,5 @@
 // lib/features/auth/controllers/auth_controller.dart
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:messeconnect/features/auth/services/auth_api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 /*
 final authControllerProvider =
 StateNotifierProvider<AuthController, AsyncValue<void>>(

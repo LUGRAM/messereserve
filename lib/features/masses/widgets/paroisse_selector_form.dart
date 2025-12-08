@@ -16,7 +16,7 @@ class ParoisseSelectorForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<ParoisseModel>(
-      value: selected,
+      initialValue: selected,
       decoration: InputDecoration(
         labelText: "Choisir une paroisse",
         prefixIcon: const Icon(Icons.church_outlined),

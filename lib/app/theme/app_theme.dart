@@ -13,8 +13,8 @@ class AppTheme {
     final textTheme = GoogleFonts.poppinsTextTheme(
       base.textTheme,
     ).apply(
-      bodyColor: AppColors.textPrimary,
-      displayColor: AppColors.textPrimary,
+      bodyColor: AppColors.textPrimary1,
+      displayColor: AppColors.textPrimary1,
     );
 
     return base.copyWith(

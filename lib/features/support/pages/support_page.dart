@@ -31,7 +31,7 @@ class SupportPage extends StatelessWidget {
           // ------------------------------------------------------------
           const Text(
             "Assistance utilisateur",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 10),
 
@@ -56,7 +56,7 @@ class SupportPage extends StatelessWidget {
           // ------------------------------------------------------------
           const Text(
             "Support direct",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 10),
 
@@ -88,7 +88,7 @@ class SupportPage extends StatelessWidget {
           // ------------------------------------------------------------
           const Text(
             "Support technique",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 10),
 
@@ -141,7 +141,7 @@ class SupportPage extends StatelessWidget {
         leading: CircleAvatar(
           radius: 22,
           backgroundColor: AppColors.surface,
-          child: Icon(icon, color: AppColors.textPrimary),
+          child: Icon(icon, color: AppColors.textPrimary2),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text(subtitle),

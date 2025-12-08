@@ -65,7 +65,7 @@ class ProfilePage extends StatelessWidget {
                 children: const [
                   Text(
                     "Nom Utilisateur",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
                   ),
                   SizedBox(height: 4),
                   Text(
@@ -166,7 +166,7 @@ class ProfilePage extends StatelessWidget {
       elevation: 1,
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.textPrimary, size: 26),
+        leading: Icon(icon, color: AppColors.textPrimary2, size: 26),
         title: Text(title, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,

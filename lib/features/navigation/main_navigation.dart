@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:messeconnect/app/theme/app_colors.dart';
+
+import '../../layouts/drawer/app_drawer.dart';
 
 class MainNavigation extends StatefulWidget {
   final Widget content;
@@ -18,17 +19,15 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),   // ← AJOUT OBLIGATOIRE ICI
       body: widget.content,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-
-        backgroundColor: AppColors.navBackground,     // gris clair / blanc
-        selectedItemColor: AppColors.navActive,       // turquoise (icône sélectionné)
-        unselectedItemColor: AppColors.navInactive,   // gris (icônes non sélectionnés)
-
+        backgroundColor: AppColors.navBackground,
+        selectedItemColor: AppColors.navActive,
+        unselectedItemColor: AppColors.navInactive,
         showSelectedLabels: true,
-        showUnselectedLabels: false,              // labels cachés (APKTEST style)
-
+        showUnselectedLabels: false,
         onTap: (i) {
           setState(() => _currentIndex = i);
           switch (i) {
@@ -38,7 +37,6 @@ class _MainNavigationState extends State<MainNavigation> {
             case 3: context.go('/profile'); break;
           }
         },
-
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_rounded),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:messeconnect/app/theme/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,7 +15,6 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: AppColors.surface,
-
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -53,8 +53,8 @@ class AppDrawer extends StatelessWidget {
             icon: Icons.location_city_rounded,
             label: "Liste des paroisses",
             onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, "/parishes");
+              Navigator.pop(context);  // ferme drawer
+              context.go("/parishes"); // route go_router
             },
           ),
 
@@ -63,39 +63,39 @@ class AppDrawer extends StatelessWidget {
             label: "À propos d’une paroisse",
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, "/parish-details");
+              context.go("/parish-details");
             },
           ),
 
           const Divider(),
 
           // ---------------------------------------------------------
-          // 🔹 SECTION : APPLICATION
+          // 🔹 SECTION : APP
           // ---------------------------------------------------------
           _sectionTitle("Application"),
 
           _item(
             icon: Icons.info_outline_rounded,
             label: "À propos de MesseConnect",
-            onTap: () {},
+            onTap: () => _open("https://messeconnect.com/about"),
           ),
 
           _item(
             icon: Icons.privacy_tip_rounded,
             label: "Politique de confidentialité",
-            onTap: () {},
+            onTap: () => _open("https://messeconnect.com/privacy"),
           ),
 
           _item(
             icon: Icons.description_rounded,
             label: "Conditions d’utilisation",
-            onTap: () {},
+            onTap: () => _open("https://messeconnect.com/terms"),
           ),
 
           _item(
             icon: Icons.gavel_rounded,
             label: "Mentions légales",
-            onTap: () {},
+            onTap: () => _open("https://messeconnect.com/legal"),
           ),
 
           _item(
@@ -108,16 +108,19 @@ class AppDrawer extends StatelessWidget {
           const Divider(),
 
           // ---------------------------------------------------------
-          // 🔹 DECONNEXION
+          // 🔹 DÉCONNEXION
           // ---------------------------------------------------------
           _item(
             icon: Icons.logout_rounded,
             label: "Se déconnecter",
             color: Colors.red,
-            onTap: () {},
+            onTap: () {
+              Navigator.pop(context);
+              context.go("/login");
+            },
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
         ],
       ),
     );
@@ -135,7 +138,7 @@ class AppDrawer extends StatelessWidget {
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
+          color: AppColors.textPrimary2,
         ),
       ),
     );
@@ -149,11 +152,11 @@ class AppDrawer extends StatelessWidget {
     Widget? trailing,
   }) {
     return ListTile(
-      leading: Icon(icon, color: color ?? AppColors.textPrimary),
+      leading: Icon(icon, color: color ?? AppColors.textPrimary2),
       title: Text(
         label,
         style: TextStyle(
-          color: color ?? AppColors.textPrimary,
+          color: color ?? AppColors.textPrimary2,
           fontSize: 15,
         ),
       ),

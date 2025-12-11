@@ -47,7 +47,7 @@ class HomePage extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  // Plus tard → route vers search
+                  // Une fois validé par ton tuteur :
                   // context.push("/search");
                 },
                 child: Container(
@@ -84,7 +84,7 @@ class HomePage extends StatelessWidget {
                 size: 26,
               ),
               onPressed: () {
-                // context.push("/notifications");
+                context.push("/notifications");
               },
             ),
           ],
@@ -139,8 +139,7 @@ class HomePage extends StatelessWidget {
                       key: const ValueKey("card_messe_action_grace"),
                       title: "Messe D' Action De Grâce",
                       heroTag: 'messe_action_grace',
-                      imageAsset:
-                      'assets/images/masses/action_grace.jpg',
+                      imageAsset: 'assets/images/masses/action_grace.jpg',
                       borderColor: Colors.redAccent,
                       onTap: () =>
                           navigateToMass(context, MassType.actionGrace),

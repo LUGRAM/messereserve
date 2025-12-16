@@ -14,16 +14,16 @@ import 'package:messeconnect/features/auth/pages/register_page.dart';
 
 // Pages Home
 import 'package:messeconnect/features/home/pages/home_page.dart';
-import 'package:messeconnect/features/masses/pages/reservations_list_page.dart';
+import 'package:messeconnect/features/masses/pages/reservations/reservations_list_page.dart';
 
 // Pages Messes
-import 'package:messeconnect/features/masses/pages/nuptial_mass_page.dart';
-import 'package:messeconnect/features/masses/pages/healing_mass_page.dart';
-import 'package:messeconnect/features/masses/pages/thanksgiving_mass_page.dart';
-import 'package:messeconnect/features/masses/pages/requiem_mass_page.dart';
+import 'package:messeconnect/features/masses/pages/types_masses/nuptial_mass_page.dart';
+import 'package:messeconnect/features/masses/pages/types_masses/healing_mass_page.dart';
+import 'package:messeconnect/features/masses/pages/types_masses/thanksgiving_mass_page.dart';
+import 'package:messeconnect/features/masses/pages/types_masses/requiem_mass_page.dart';
 
 import '../../features/masses/models/reservation_model.dart';
-import '../../features/masses/pages/reservation_detail_page.dart';
+import '../../features/masses/pages/reservations/reservation_detail_page.dart';
 
 import '../../features/navigation/main_navigation.dart';
 
@@ -139,8 +139,8 @@ class AppRouter {
             path: '/payment',
             builder: (_, __) => const PaymentChoicePage(),
           ),
-        ],
-      ),
-    ],
+        ]
+      )
+    ]
   );
 }

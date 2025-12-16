@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:messeconnect/features/masses/pages/reservations_list_page.dart';
+import 'package:messeconnect/features/masses/pages/reservations/reservations_list_page.dart';
 
 class ReservationSentPage extends StatelessWidget {
   final String reference;

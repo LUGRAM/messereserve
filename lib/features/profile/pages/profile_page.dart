@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_colors.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -21,7 +22,7 @@ class ProfilePage extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
+              context.go('/login');
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text("Déconnecter"),
@@ -114,7 +115,7 @@ class ProfilePage extends StatelessWidget {
           _tile(
             icon: Icons.notifications_active_rounded,
             title: "Notifications",
-            onTap: () {},
+            onTap: () => context.push("/notifications"),
           ),
 
           _tile(

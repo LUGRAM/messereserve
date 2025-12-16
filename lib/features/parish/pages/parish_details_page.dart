@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ParishDetailsPage extends StatelessWidget {
   const ParishDetailsPage({super.key});
@@ -13,7 +14,7 @@ class ParishDetailsPage extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text("Détails de la paroisse", style: TextStyle(color: Colors.black)),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ParishesPage extends StatelessWidget {
   const ParishesPage({super.key});
@@ -20,10 +21,12 @@ class ParishesPage extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),   // ← correction importante
         ),
-        title:
-        const Text("Paroisses", style: TextStyle(color: Colors.black)),
+        title: const Text(
+          "Paroisses",
+          style: TextStyle(color: Colors.black),
+        ),
       ),
 
       body: ListView.separated(
@@ -32,16 +35,22 @@ class ParishesPage extends StatelessWidget {
         separatorBuilder: (_, __) => const Divider(),
         itemBuilder: (context, i) {
           final p = parishes[i];
+
           return ListTile(
             leading: CircleAvatar(
               radius: 23,
               backgroundColor: Colors.red.shade100,
               child: Icon(Icons.church, color: Colors.red.shade400),
             ),
-            title: Text(p["name"]!, style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(
+              p["name"]!,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Text(p["city"]!),
             trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => Navigator.pushNamed(context, "/parish-details"),
+
+            // ouvrir la page de détails via GoRouter
+            onTap: () => context.push("/parish-details"),
           );
         },
       ),

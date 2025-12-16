@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
-import 'package:messeconnect/features/payments/pages/payment_choice_page.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -34,25 +35,29 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Paiements"),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
-      ),
+    return GradientBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
 
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _pendingPayments.isEmpty
-          ? _emptyView()
-          : ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _pendingPayments.length,
-        itemBuilder: (_, i) {
-          final r = _pendingPayments[i];
-          return _paymentCard(context, r);
-        },
+        appBar: AppBar(
+          title: const Text("Paiements"),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 1,
+        ),
+
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _pendingPayments.isEmpty
+            ? _emptyView()
+            : ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: _pendingPayments.length,
+          itemBuilder: (_, i) {
+            final r = _pendingPayments[i];
+            return _paymentCard(context, r);
+          },
+        ),
       ),
     );
   }
@@ -65,19 +70,16 @@ class _PaymentPageState extends State<PaymentPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.payments_rounded, size: 64, color: Colors.grey.shade300),
+          Icon(Icons.payments_rounded, size: 64, color: Colors.white70),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             "Aucun paiement en attente",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade700,
-            ),
+            style: TextStyle(fontSize: 18, color: Colors.white),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             "Vos messes validées apparaîtront ici.",
-            style: TextStyle(color: Colors.grey.shade500),
+            style: TextStyle(color: Colors.white70),
           ),
         ],
       ),
@@ -91,6 +93,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 14),
+
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -135,12 +138,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
                 icon: const Icon(Icons.lock),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PaymentChoicePage(),
-                    ),
-                  );
+                  context.push('/payment-choice'); // GoRouter navigation
                 },
                 label: const Text(
                   "Payer maintenant",

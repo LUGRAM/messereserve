@@ -19,5 +19,9 @@ void navigateToMass(BuildContext context, MassType type) {
     case MassType.requiem:
       context.push('/mass/requiem');
       break;
+
+    case MassType.bapteme:
+      context.push('/mass/bapteme');
+      break;
   }
 }

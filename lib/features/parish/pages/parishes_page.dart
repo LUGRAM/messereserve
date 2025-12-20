@@ -21,7 +21,7 @@ class ParishesPage extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
-          onPressed: () => context.pop(),   // ← correction importante
+          onPressed: () => context.go('/home'),   // ← correction importante
         ),
         title: const Text(
           "Paroisses",

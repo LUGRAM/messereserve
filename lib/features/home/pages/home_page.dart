@@ -13,15 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  late Future<List<MassModel>> _massesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _massesFuture = MassService.fetchMasses();
-  }
-
   // -----------------------------------------------------------
   // 🔹 HEADER : titre + menu + search + notifications
   // -----------------------------------------------------------
@@ -29,7 +20,6 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         const Text(
           "MesseConnect",
           style: TextStyle(
@@ -38,13 +28,9 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-
         const SizedBox(height: 6),
-
         Row(
           children: [
-
-            // MENU (Drawer)
             Builder(
               builder: (ctx) => IconButton(
                 icon: const Icon(Icons.menu_rounded,
@@ -52,10 +38,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             ),
-
             const SizedBox(width: 6),
-
-            // SEARCH (placeholder)
             Expanded(
               child: GestureDetector(
                 onTap: () {
@@ -84,10 +67,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
             const SizedBox(width: 10),
-
-            // NOTIFICATIONS
             IconButton(
               icon: const Icon(
                 Icons.notifications_none_rounded,
@@ -119,14 +99,11 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               _buildHeader(context),
               SizedBox(height: size.height * 0.03),
-
-              // 🔹 GRID DYNAMIQUE DES MESSES
               Expanded(
                 child: FutureBuilder<List<MassModel>>(
-                  future: _massesFuture,
+                  future: MassService.fetchMasses(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
@@ -146,25 +123,24 @@ class _HomePageState extends State<HomePage> {
                           key: ValueKey("card_${m.id}"),
                           title: m.title,
                           heroTag: m.heroTag,
-                          imageAsset: m.image,
-                          borderColor: Color(m.accentColor),
-                          onTap: () => context.push(m.route),
+                          imageAsset: m.imageAsset,
+                          borderColor: m.accentColor,
+                          onTap: () {
+                            context.push('/mass/${m.id}', extra: m);
+                          },
                         );
                       }).toList(),
                     );
                   },
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // 🔹 BOUTON RÉSERVATIONS
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.9),
+                    backgroundColor: Colors.white.withOpacity(0.9),
                     elevation: 6,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),

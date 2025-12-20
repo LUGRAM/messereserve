@@ -16,6 +16,8 @@ dependencies:
   lottie: ^3.3.2
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.12.0
+  http: ^1.6.0
+
 
 
   # Pour utiliser des fonts custom (ex: Poppins)

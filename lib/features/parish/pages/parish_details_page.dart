@@ -10,11 +10,11 @@ class ParishDetailsPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF8F8F8),
 
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xffe53a5a),
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/home'),
         ),
         title: const Text("Détails de la paroisse", style: TextStyle(color: Colors.black)),
       ),
@@ -37,20 +37,20 @@ class ParishDetailsPage extends StatelessWidget {
           const SizedBox(height: 20),
 
           const Text("Paroisse Saint Michel",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: Colors.black)),
           const SizedBox(height: 6),
-          Text("Libreville, Gabon", style: TextStyle(color: Colors.grey.shade700)),
+          Text("Libreville, Gabon", style: TextStyle(color: Colors.black)),
 
           const SizedBox(height: 20),
 
           const Text("Informations",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.black)),
           const SizedBox(height: 12),
 
-          _info(Icons.location_on, "Adresse", "Rue du Bord de Mer, Libreville"),
+          _info(Icons.location_on, "Adresse", "Nkembo , Libreville"),
           _info(Icons.phone, "Téléphone", "+241 01 23 45 67"),
           _info(Icons.schedule, "Horaires", "Lun–Ven : 8h - 17h"),
-          _info(Icons.person, "Prêtre responsable", "Père Alain Ndzeng"),
+          _info(Icons.person, "Prêtre responsable", "Père Alain Ndze"),
         ],
       ),
     );
@@ -66,8 +66,8 @@ class ParishDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(value),
+              Text(label, style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
+              Text(value, style: const TextStyle(color: Colors.black)),
             ],
           )
         ],

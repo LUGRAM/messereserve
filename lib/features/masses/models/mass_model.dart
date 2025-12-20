@@ -1,19 +1,29 @@
+import 'package:flutter/material.dart';
+
 class MassModel {
   final String id;
+
+  // Affichage
   final String title;
   final String subtitle;
-  final String image;
+  final String imageAsset;
   final String heroTag;
-  final int accentColor; // stocké en int (Color.value)
-  final String route; // ex: /mass/requiem
+
+  // UI
+  final Color accentColor;
+
+  // Spécifique refactor
+  final String lottieAsset;
+  final bool requiresBeneficiary;
 
   const MassModel({
     required this.id,
     required this.title,
     required this.subtitle,
-    required this.image,
+    required this.imageAsset,
     required this.heroTag,
     required this.accentColor,
-    required this.route,
+    required this.lottieAsset,
+    required this.requiresBeneficiary,
   });
 }

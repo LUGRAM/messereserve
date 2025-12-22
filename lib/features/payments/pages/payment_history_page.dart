@@ -37,6 +37,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           title: const Text("Historique des paiements"),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
+          centerTitle: true,
+          elevation: 1,
         ),
         body: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -69,42 +71,57 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Widget _paymentCard(ReservationModel r) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0x80DF274C), Color(0x80F26E5A)],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          )
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Titre de la messe
             Text(
               r.massTitle,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 4),
             Text("Référence : ${r.reference}",
-                style: const TextStyle(color: Colors.black54)),
-
+                style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("${r.date} - ${r.time}",
-                    style: const TextStyle(fontWeight: FontWeight.w500)),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, color: Colors.white)),
                 Text(r.paroisseName ?? "Paroisse inconnue",
-                    style: const TextStyle(color: Colors.black87)),
+                    style: const TextStyle(color: Colors.white)),
               ],
             ),
-
-            const Divider(height: 24),
-
+            const Divider(height: 24, color: Colors.white30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Montant : ${r.amount ?? "—"} FCFA",
-                    style: const TextStyle(fontSize: 15)),
+                    style:
+                    const TextStyle(fontSize: 15, color: Colors.white)),
                 Row(
                   children: [
                     ClipRRect(
@@ -115,7 +132,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                         width: 24,
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.sim_card, size: 20, color: Colors.grey),
+                            Icon(Icons.sim_card, size: 20, color: Colors.white70),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -124,24 +141,24 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
+                        color: Colors.white,
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
             Container(
               padding:
               const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
               decoration: BoxDecoration(
-                color: Colors.green.shade600,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text(
                 "Paiement réussi",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.green),
               ),
             ),
           ],

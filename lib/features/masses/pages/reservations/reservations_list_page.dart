@@ -44,7 +44,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
       case "pending_validation":
         return _paymentState(
           label: "Régler la commande",
-          color: Colors.grey.shade400,
+          color: Colors.blueGrey.shade700,
           icon: Icons.lock,
           enabled: false,
         );
@@ -62,7 +62,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
         return _statusBadge("Payée", Colors.green, Icons.check_circle);
 
       case "rejected":
-        return _statusBadge("Annulée", Colors.grey, Icons.cancel);
+        return _statusBadge("Annulée", Colors.grey.shade700, Icons.cancel);
 
       default:
         return const SizedBox();
@@ -81,7 +81,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: color.withOpacity(enabled ? 1.0 : 0.5),
+          color: color.withValues(alpha: enabled ? 1.0 : 0.5),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -102,7 +102,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.9),
+        color: color.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -127,9 +127,9 @@ class _ReservationsListPageState extends State<ReservationsListPage>
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
+            color: Colors.black26,
+            blurRadius: 8,
+            offset: Offset(0, 3),
           ),
         ],
       ),
@@ -138,7 +138,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
         children: [
           CircleAvatar(
             radius: 26,
-            backgroundColor: Colors.orange.withOpacity(0.15),
+            backgroundColor: Colors.orange.withValues(alpha: 0.15),
             child: const Icon(Icons.church, color: Colors.orange),
           ),
           const SizedBox(width: 12),
@@ -176,43 +176,54 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   // ----------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Mes Réservations"),
-        centerTitle: true,
-        backgroundColor: const Color(0xFFF8F8F8), // ou Colors.grey[50] pour un blanc cassé
-        elevation: 1,
-        foregroundColor: const Color(0xff000000),
-        bottom: TabBar(
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xff89223B), Color(0xffAC4B5B)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text("Mes Réservations"),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 1,
+          foregroundColor: Colors.white,
+          bottom: TabBar(
+            controller: _tabController,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white60,
+            indicatorColor: Colors.deepOrangeAccent,
+            tabs: const [
+              Tab(text: "Demandes"),
+              Tab(text: "Succès"),
+              Tab(text: "Annulées"),
+            ],
+          ),
+        ),
+        body: _loading
+            ? Center(
+          child: Lottie.asset(
+            "assets/lottie/church_glow.json",
+            width: 140,
+            height: 140,
+          ),
+        )
+            : TabBarView(
           controller: _tabController,
-          labelColor: Colors.deepOrange,
-          unselectedLabelColor: Colors.black45,
-          indicatorColor: Colors.deepOrange,
-          tabs: const [
-            Tab(text: "Demandes"),
-            Tab(text: "Succès"),
-            Tab(text: "Annulées"),
+          children: [
+            _buildTab(_filterMultiple(["pending_validation", "pending_payment"])),
+            _buildTab(_filterMultiple(["paid"])),
+            _buildTab(_filterMultiple(["rejected"])),
           ],
         ),
       ),
-      body: _loading
-          ? Center(
-        child: Lottie.asset(
-          "assets/lottie/church_glow.json",
-          width: 140,
-          height: 140,
-        ),
-      )
-          : TabBarView(
-        controller: _tabController,
-        children: [
-          _buildTab(_filterMultiple(["pending_validation", "pending_payment"])),
-          _buildTab(_filterMultiple(["paid"])),
-          _buildTab(_filterMultiple(["rejected"])),
-        ],
-      ),
     );
   }
+
 
   Widget _buildTab(List<ReservationModel> list) {
     if (list.isEmpty) {

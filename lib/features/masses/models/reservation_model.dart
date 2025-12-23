@@ -6,6 +6,8 @@ class ReservationModel {
   final String status;
   final String? pastorName;
   final String? paroisseName;
+  final int? amount;
+  final String? operator;
 
   ReservationModel({
     required this.reference,
@@ -15,6 +17,8 @@ class ReservationModel {
     required this.status,
     this.pastorName,
     this.paroisseName,
+    this.amount,
+    this.operator
   });
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class ReservationModel {
       status: json["status"] ?? "",
       pastorName: json["pastor_name"],
       paroisseName: json["paroisse_name"],
+      amount: json['amount'],
+      operator: json['operator'],
     );
   }
 }

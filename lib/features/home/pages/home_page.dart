@@ -2,21 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/app/widgets/service_card.dart';
-import 'package:messeconnect/features/masses/mass_navigation.dart';
-import 'package:messeconnect/features/masses/models/mass_type.dart';
+import 'package:messeconnect/features/masses/models/mass_model.dart';
+import 'package:messeconnect/features/masses/services/mass_service.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   // -----------------------------------------------------------
-  // 🔹 HEADER COMPLET : MesseConnect + Menu + Search + Notifs
+  // 🔹 HEADER : titre + menu + search + notifications
   // -----------------------------------------------------------
   Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        // ──────────────── TITRE ────────────────
         const Text(
           "MesseConnect",
           style: TextStyle(
@@ -25,14 +28,9 @@ class HomePage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-
         const SizedBox(height: 6),
-
-        // ──────────────── ROW → MENU + SEARCH + NOTIFS ────────────────
         Row(
           children: [
-
-            // ----- MENU (Drawer) -----
             Builder(
               builder: (ctx) => IconButton(
                 icon: const Icon(Icons.menu_rounded,
@@ -40,15 +38,11 @@ class HomePage extends StatelessWidget {
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             ),
-
             const SizedBox(width: 6),
-
-            // ----- SEARCH BAR -----
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  // Plus tard → route vers search
-                  // context.push("/search");
+                  // À valider avec le tuteur
                 },
                 child: Container(
                   height: 38,
@@ -73,19 +67,14 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(width: 10),
-
-            // ----- NOTIFICATIONS -----
             IconButton(
               icon: const Icon(
                 Icons.notifications_none_rounded,
                 color: Colors.white,
                 size: 26,
               ),
-              onPressed: () {
-                // context.push("/notifications");
-              },
+              onPressed: () => context.push("/notifications"),
             ),
           ],
         )
@@ -107,77 +96,51 @@ class HomePage extends StatelessWidget {
             horizontal: size.width * 0.06,
             vertical: size.height * 0.02,
           ),
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              // 🔹 HEADER (NOUVEAU)
               _buildHeader(context),
               SizedBox(height: size.height * 0.03),
-
-              // 🔹 GRID DES SERVICES
               Expanded(
-                child: GridView.count(
-                  physics: const BouncingScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 18,
-                  mainAxisSpacing: 18,
-                  children: [
+                child: FutureBuilder<List<MassModel>>(
+                  future: MassService.fetchMasses(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      );
+                    }
 
-                    ServiceCard(
-                      key: const ValueKey("card_messe_requiem"),
-                      title: 'Messe De Requiem',
-                      heroTag: 'messe_requiem',
-                      imageAsset: 'assets/images/masses/requiem.jpg',
-                      borderColor: Colors.lightBlue,
-                      onTap: () =>
-                          navigateToMass(context, MassType.requiem),
-                    ),
+                    final masses = snapshot.data!;
 
-                    ServiceCard(
-                      key: const ValueKey("card_messe_action_grace"),
-                      title: "Messe D' Action De Grâce",
-                      heroTag: 'messe_action_grace',
-                      imageAsset:
-                      'assets/images/masses/action_grace.jpg',
-                      borderColor: Colors.redAccent,
-                      onTap: () =>
-                          navigateToMass(context, MassType.actionGrace),
-                    ),
-
-                    ServiceCard(
-                      key: const ValueKey("card_messe_guerison"),
-                      title: 'Messe Pour La Santé Et La Guérison',
-                      heroTag: 'messe_guerison',
-                      imageAsset: 'assets/images/masses/guerison.jpg',
-                      borderColor: Colors.green,
-                      onTap: () =>
-                          navigateToMass(context, MassType.guerison),
-                    ),
-
-                    ServiceCard(
-                      key: const ValueKey("card_messe_nuptiale"),
-                      title: 'Messe Nuptiale',
-                      heroTag: 'messe_nuptiale',
-                      imageAsset: 'assets/images/masses/nuptial.jpg',
-                      borderColor: Colors.blueAccent,
-                      onTap: () =>
-                          navigateToMass(context, MassType.nuptial),
-                    ),
-                  ],
+                    return GridView.count(
+                      physics: const BouncingScrollPhysics(),
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 18,
+                      mainAxisSpacing: 18,
+                      children: masses.map((m) {
+                        return ServiceCard(
+                          key: ValueKey("card_${m.id}"),
+                          title: m.title,
+                          heroTag: m.heroTag,
+                          imageAsset: m.imageAsset,
+                          borderColor: m.accentColor,
+                          onTap: () {
+                            context.push('/mass/${m.id}', extra: m);
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // 🔹 BOUTON "Voir mes réservations"
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.9),
+                    backgroundColor: Colors.white.withOpacity(0.9),
                     elevation: 6,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),

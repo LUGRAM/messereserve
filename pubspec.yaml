@@ -16,11 +16,16 @@ dependencies:
   lottie: ^3.3.2
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.12.0
+<<<<<<< HEAD
   intl_phone_field: ^3.2.0
   dio: ^5.4.0
   get: ^4.6.6
   get_storage: ^2.1.1
   http: ^1.1.0
+=======
+  http: ^1.6.0
+
+>>>>>>> 2d416c39b815b0226ad2ab548d062aed8f22d9e8
 
 
   # Pour utiliser des fonts custom (ex: Poppins)

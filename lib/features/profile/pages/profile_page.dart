@@ -24,7 +24,7 @@ class ProfilePage extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Get.back(); // ferme la popup
-              Get.find<AuthController>().logout(); // logout + redirection
+              Get.find<AuthController>().logout();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Padding(
@@ -117,11 +117,11 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          _tile(
-            icon: Icons.notifications_active_rounded,
-            title: "Notifications",
-            onTap: () {},
-          ),
+          // _tile(
+          //   icon: Icons.notifications_active_rounded,
+          //   title: "Notifications",
+          //   onTap: () => context.push("/notifications"),
+          // ),
 
           _tile(
             icon: Icons.language_rounded,

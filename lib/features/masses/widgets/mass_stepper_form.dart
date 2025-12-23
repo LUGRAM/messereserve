@@ -8,7 +8,7 @@ import 'package:messeconnect/features/masses/models/mock_paroisses.dart';
 
 import 'package:messeconnect/features/masses/models/reservation_request.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
-import 'package:messeconnect/features/masses/pages/reservation_sent_page.dart';
+import 'package:messeconnect/features/masses/pages/reservations/reservation_sent_page.dart';
 import 'package:messeconnect/features/masses/widgets/pastor_selector.dart';
 
 import '../controllers/paroisse_controller.dart';

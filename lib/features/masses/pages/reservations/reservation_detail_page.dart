@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 
-
 class ReservationDetailPage extends StatelessWidget {
   final ReservationModel reservation;
 
@@ -48,12 +47,9 @@ class ReservationDetailPage extends StatelessWidget {
         foregroundColor: Colors.black,
         elevation: 1,
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-
-          // Titre messe
           Text(
             r.massTitle,
             style: const TextStyle(
@@ -61,15 +57,11 @@ class ReservationDetailPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           const SizedBox(height: 6),
           Text(
-            "Réf : ${r.reference}",
-            style: const TextStyle(
-              color: Colors.black54,
-            ),
+            "Réf : \${r.reference}",
+            style: const TextStyle(color: Colors.black54),
           ),
-
           const SizedBox(height: 20),
 
           // Date & heure
@@ -77,11 +69,10 @@ class ReservationDetailPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Date & heure :", style: TextStyle(fontSize: 16)),
-              Text("${r.date} - ${r.time}",
+              Text("\${r.date} - \${r.time}",
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
-
           const SizedBox(height: 14),
 
           // Paroisse
@@ -94,7 +85,6 @@ class ReservationDetailPage extends StatelessWidget {
             ],
           ),
 
-
           const SizedBox(height: 14),
 
           // Pasteur
@@ -102,11 +92,9 @@ class ReservationDetailPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Pasteur :", style: TextStyle(fontSize: 16)),
-              Text(r.pastorName ?? "Non précisé",
-                  style: const TextStyle(fontSize: 16)),
+              Text(r.pastorName ?? "Non précisé", style: const TextStyle(fontSize: 16)),
             ],
           ),
-
           const SizedBox(height: 14),
 
           // Statut
@@ -127,29 +115,25 @@ class ReservationDetailPage extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
           const Divider(),
-
           const SizedBox(height: 14),
 
-          // Bouton paiement
-          ElevatedButton.icon(
-            icon: const Icon(Icons.payments),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+          if (r.status == "pending_payment")
+            ElevatedButton.icon(
+              icon: const Icon(Icons.payments),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: () {
+                context.push('/payment-choice', extra: r);
+              },
+              label: const Text(
+                "Régler la commande",
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              ),
             ),
-            onPressed: () {
-              context.push('/payment');
-            },
-            label: const Text(
-              "Payer maintenant",
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-            ),
-          ),
-
 
           if (r.status == "paid")
             ElevatedButton.icon(

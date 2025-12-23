@@ -23,7 +23,6 @@ class ServiceCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: borderColor, width: 2),
           boxShadow: const [

@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.10.1
+  sdk: ^3.9.0
 
 dependencies:
   flutter:
@@ -16,6 +16,11 @@ dependencies:
   lottie: ^3.3.2
   url_launcher: ^6.3.2
   font_awesome_flutter: ^10.12.0
+  intl_phone_field: ^3.2.0
+  dio: ^5.4.0
+  get: ^4.6.6
+  get_storage: ^2.1.1
+  http: ^1.1.0
 
 
   # Pour utiliser des fonts custom (ex: Poppins)
@@ -30,6 +35,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/icons/
+#    - assets/icons/
     - assets/images/masses/
     - assets/lottie/

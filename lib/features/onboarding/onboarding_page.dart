@@ -1,8 +1,11 @@
 // lib/features/onboarding/onboarding_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 
+import '../../app/router/routes.dart';
 import '../../app/theme/app_colors.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -42,7 +45,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       );
     } else {
       // TODO: marquer onboarding vu dans SharedPreferences
-      context.go('/login');
+      Get.offAllNamed(Routes.login);
     }
   }
 
@@ -59,7 +62,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: () => context.go('/login'),
+                    onPressed: () => Get.offAllNamed(Routes.login),
                     child: const Text('Passer', style: TextStyle(color: Colors.white)),
                   ),
                 ),

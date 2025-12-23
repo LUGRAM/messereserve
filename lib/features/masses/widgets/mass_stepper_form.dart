@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 import 'package:messeconnect/features/masses/models/pastor_model.dart';
 import 'package:messeconnect/features/masses/models/paroisse_model.dart';
@@ -8,6 +10,9 @@ import 'package:messeconnect/features/masses/models/reservation_request.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
 import 'package:messeconnect/features/masses/pages/reservation_sent_page.dart';
 import 'package:messeconnect/features/masses/widgets/pastor_selector.dart';
+
+import '../controllers/paroisse_controller.dart';
+import '../controllers/pastor_controller.dart';
 
 class MassStepperForm extends StatefulWidget {
   final Color accentColor;
@@ -31,7 +36,19 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
   // --- Paroisse
   ParoisseModel? _selectedParoisse;
-  final List<ParoisseModel> _paroissesList = mockParoisses;
+  // final List<ParoisseModel> _paroissesList = mockParoisses;
+
+  final ParoisseController _paroisseCtrl = Get.put(ParoisseController());
+  final PastorController _pastorCtrl = Get.put(PastorController());
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    _paroisseCtrl.loadParoisses();
+    _pastorCtrl.loadPastors();
+  }
 
   // --- Messe
   DateTime? _dateTime;
@@ -106,16 +123,26 @@ class _MassStepperFormState extends State<MassStepperForm> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
       builder: (_) {
-        return ListView(
-          children: _paroissesList.map((paroisse) {
-            return ListTile(
-              title: Text(paroisse.name),
-              subtitle: Text(paroisse.address),
-              trailing: const Icon(Icons.church),
-              onTap: () => Navigator.pop(context, paroisse),
-            );
-          }).toList(),
-        );
+        return Obx(() {
+          if (_paroisseCtrl.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (_paroisseCtrl.paroisses.isEmpty) {
+            return const Center(child: Text("Aucune paroisse trouvée"));
+          }
+
+          return ListView(
+            children: _paroisseCtrl.paroisses.map((paroisse) {
+              return ListTile(
+                title: Text(paroisse.nom),
+                subtitle: Text(paroisse.address),
+                trailing: const Icon(Icons.church),
+                onTap: () => Navigator.pop(context, paroisse),
+              );
+            }).toList(),
+          );
+        });
       },
     );
 
@@ -123,6 +150,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       setState(() => _selectedParoisse = p);
     }
   }
+
 
   Future<void> _choosePastor() async {
     final p = await showModalBottomSheet<PastorModel>(
@@ -260,7 +288,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
                   child: Text(
                     _selectedParoisse == null
                         ? "Choisir une paroisse (obligatoire)"
-                        : "Paroisse : ${_selectedParoisse!.name}",
+                        : "Paroisse : ${_selectedParoisse!.nom}",
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -281,7 +309,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
                   child: Text(
                     _selectedPastor == null
                         ? "Choisir un pasteur (optionnel)"
-                        : "Pasteur : ${_selectedPastor!.name}",
+                        : "Pasteur : ${_selectedPastor!.nom}",
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -441,9 +469,9 @@ class _MassStepperFormState extends State<MassStepperForm> {
     return Column(
       children: [
         row("Type de messe", widget.massTitle),
-        row("Paroisse", _selectedParoisse?.name ?? "Non précisée"),
+        row("Paroisse", _selectedParoisse?.nom ?? "Non précisée"),
         row("Date & heure", fmtDT(_dateTime)),
-        row("Pasteur choisi", _selectedPastor?.name ?? "Non précisé"),
+        row("Pasteur choisi", _selectedPastor?.nom ?? "Non précisé"),
         const SizedBox(height: 8),
 
         if (!widget.requiresBeneficiary) ...[
@@ -524,7 +552,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
             "${_dateTime!.day}/${_dateTime!.month}/${_dateTime!.year}",
             time:
             "${_dateTime!.hour.toString().padLeft(2, '0')}:${_dateTime!.minute.toString().padLeft(2, '0')}",
-            pastorName: _selectedPastor?.name ?? "",
+            pastorName: _selectedPastor?.nom ?? "",
           ),
         ),
       );

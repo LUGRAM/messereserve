@@ -1,12 +1,17 @@
 // lib/features/auth/pages/login_page.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:messeconnect/app/router/routes.dart';
 import 'package:messeconnect/app/widgets/app_text_field.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/app/widgets/primary_button.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../controllers/auth_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,21 +22,33 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+
+  final AuthController _authController = Get.put(AuthController());
+
+  final AuthController _auth = Get.put(AuthController());
 
   @override
   void dispose() {
-    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // TODO: appel AuthController (Passport)
-    context.go('/home');
+    bool ok = await _auth.login(
+      _phoneCtrl.text,
+      _passwordCtrl.text,
+    );
+
+    if (ok) {
+      Get.offAllNamed("/home"); // user authentifié
+    } else {
+      Get.snackbar("Erreur", "Impossible de créer le compte");
+    }
   }
 
   @override
@@ -67,17 +84,27 @@ class _LoginPageState extends State<LoginPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      AppTextField(
-                        hint: 'Adresse email',
-                        icon: Icons.email_outlined,
-                        controller: _emailCtrl,
+                      IntlPhoneField(
+                        decoration: InputDecoration(
+                          hintText: "Numéro de téléphone",
+                          prefixIcon: const Icon(Icons.phone_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        initialCountryCode: 'GA', // Gabon
+                        onChanged: (phone) {
+                          _phoneCtrl.text = phone.completeNumber; // +241XXXXXXXX
+                        },
+                        onCountryChanged: (country) {
+                          print('Pays sélectionné : ${country.name}');
+                        },
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Veuillez saisir votre email';
+                          if (value == null || value.number.isEmpty) {
+                            return 'Veuillez saisir votre numéro';
                           }
-                          final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                          if (!emailRegex.hasMatch(value)) {
-                            return 'Email invalide';
+                          if (value.number.length < 6) {
+                            return 'Numéro invalide';
                           }
                           return null;
                         },
@@ -109,10 +136,17 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      PrimaryButton(
-                        label: 'Se connecter',
-                        onPressed: _submit,
-                      ),
+                      // PrimaryButton(
+                      //   label: 'Se connecter',
+                      //   onPressed: _submit,
+                      // ),
+                      Obx(() {
+                        return PrimaryButton(
+                          label: _authController.isLoading.value ? "Chargement..." : "Se connecter",
+                          isLoading: _authController.isLoading.value, // si ton bouton gère un loader interne
+                          onPressed: _authController.isLoading.value ? null : _submit,
+                        );
+                      }),
                       const SizedBox(height: 24),
                       RichText(
                         text: TextSpan(
@@ -126,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontWeight: FontWeight.bold,
                               ),
                               recognizer: (TapGestureRecognizer()..onTap = () {
-                                context.go('/register');
+                                Get.offAllNamed(Routes.register);
                               }),
                             ),
                           ],

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:messeconnect/app/theme/app_colors.dart';
 
+import '../../app/router/routes.dart';
 import '../../layouts/drawer/app_drawer.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -19,7 +20,7 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const AppDrawer(),   // ← AJOUT OBLIGATOIRE ICI
+      drawer: const AppDrawer(),
       body: widget.content,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -30,11 +31,20 @@ class _MainNavigationState extends State<MainNavigation> {
         showUnselectedLabels: false,
         onTap: (i) {
           setState(() => _currentIndex = i);
+
           switch (i) {
-            case 0: context.go('/home'); break;
-            case 1: context.go('/payments'); break;
-            case 2: context.go('/support'); break;
-            case 3: context.go('/profile'); break;
+            case 0:
+              Get.offAllNamed(Routes.home);
+              break;
+            case 1:
+              Get.offAllNamed(Routes.payments);
+              break;
+            case 2:
+              Get.offAllNamed(Routes.support);
+              break;
+            case 3:
+              Get.offAllNamed(Routes.profile);
+              break;
           }
         },
         items: const [

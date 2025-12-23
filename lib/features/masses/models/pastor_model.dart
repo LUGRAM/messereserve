@@ -1,13 +1,22 @@
 class PastorModel {
   final int id;
-  final String name;
-  final String image;
-  final String? phone;
+  final String nom;
+  final String telephone;
+  final String photo;
 
   PastorModel({
     required this.id,
-    required this.name,
-    required this.image,
-    this.phone,
+    required this.nom,
+    required this.telephone,
+    required this.photo,
   });
+
+  factory PastorModel.fromJson(Map<String, dynamic> json) {
+    return PastorModel(
+      id: json["id"],
+      nom: json["nom"],
+      telephone: json["telephone"] ?? "",
+      photo: json["photo"] ?? "",
+    );
+  }
 }

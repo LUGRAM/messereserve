@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -7,24 +10,27 @@ class ProfilePage extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // POPUP DE DECONNEXION
   // ---------------------------------------------------------------------------
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
+  void _confirmLogout() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.blueAccent,
         title: const Text("Déconnexion"),
         content: const Text("Voulez-vous vraiment vous déconnecter ?"),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Get.back(), // ferme la popup
             child: const Text("Annuler"),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Get.back(); // ferme la popup
+              Get.find<AuthController>().logout(); // logout + redirection
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text("Déconnecter"),
+            child: Padding(
+              padding: EdgeInsets.only(left: 10.0, right: 10.0),
+              child: Text("Déconnecter"),
+            ),
           ),
         ],
       ),
@@ -142,7 +148,7 @@ class ProfilePage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
               icon: const Icon(Icons.logout_rounded),
-              onPressed: () => _confirmLogout(context),
+              onPressed: () => _confirmLogout(),
               label: const Text(
                 "Déconnexion",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

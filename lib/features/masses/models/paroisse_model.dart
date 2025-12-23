@@ -1,22 +1,22 @@
 class ParoisseModel {
   final int id;
-  final String name;
+  final String nom;
   final String address;
-  final String city;
+  final String logo;
 
   ParoisseModel({
     required this.id,
-    required this.name,
+    required this.nom,
     required this.address,
-    required this.city,
+    required this.logo,
   });
 
   factory ParoisseModel.fromJson(Map<String, dynamic> json) {
     return ParoisseModel(
       id: json['id'],
-      name: json['name'],
+      nom: json['nom'],
       address: json['address'] ?? '',
-      city: json['city'] ?? '',
+      logo: json['logo'] ?? '',
     );
   }
 }

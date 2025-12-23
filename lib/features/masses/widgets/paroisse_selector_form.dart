@@ -25,7 +25,7 @@ class ParoisseSelectorForm extends StatelessWidget {
       items: paroisses.map((p) {
         return DropdownMenuItem(
           value: p,
-          child: Text(p.name),
+          child: Text(p.nom),
         );
       }).toList(),
       onChanged: (value) {

@@ -1,40 +1,54 @@
-// lib/features/auth/controllers/auth_controller.dart
+import 'package:get/get.dart';
+import '../../../core/services/AuthService.dart';
 
-/*
-final authControllerProvider =
-StateNotifierProvider<AuthController, AsyncValue<void>>(
-      (ref) => AuthController(ref),
-);
+class AuthController extends GetxController {
+  final AuthService _service = AuthService();
 
-class AuthController extends StateNotifier<AsyncValue<void>> {
-  AuthController(this.ref) : super(const AsyncData(null));
+  final isLoading = false.obs;
 
-  final Ref ref;
+  // ========= REGISTER =========
+  Future<bool> register(String name, String phone, String password) async {
+    isLoading.value = true;
 
-  final _api = AuthApi();
+    final decoded = await _service.register(
+      name: name,
+      phone: phone,
+      password: password,
+    );
 
-  Future<void> login(String email, String pass) async {
-    state = const AsyncLoading();
+    isLoading.value = false;
+
+    // Si un token est envoyé → succès
+    return decoded != null && decoded["access_token"] != null;
+  }
+
+  // ========= LOGIN =========
+  Future<bool> login(String phone, String password) async {
     try {
-      final res = await _api.login(email, pass);
+      isLoading.value = true;
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString("access_token", res["access_token"]);
+      final decoded = await _service.login(
+        phone: phone,
+        password: password,
+      );
 
-      state = const AsyncData(null);
+      print("Decode value");
+      print(decoded);
+
+      isLoading.value = false;
+
+      return decoded["access_token"] != null;
+
     } catch (e) {
-      state = AsyncError(e, StackTrace.current);
+      print("Erreur LOGIN : $e");
+      isLoading.value = false;
+      return false;
     }
   }
 
-  Future<void> register(String name, String email, String pass) async {
-    state = const AsyncLoading();
-    try {
-      await _api.register(name, email, pass);
-      state = const AsyncData(null);
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
-    }
+  // ========= LOGOUT =========
+  void logout() {
+    _service.logout();
+    Get.offAllNamed("/login");
   }
 }
-*/

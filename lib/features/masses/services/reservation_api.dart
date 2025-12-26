@@ -1,5 +1,5 @@
 import '../models/reservation_model.dart';
-import '../models/reservation_request.dart';
+import '../requests/reservation_request.dart';
 
 class ReservationApi {
   static Future<Map<String, dynamic>> createReservation(

@@ -1,8 +1,11 @@
+// lib/features/payments/pages/payment_form_page.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+
 import '../../../app/theme/app_colors.dart';
 import '../../../app/widgets/primary_button_loading.dart';
+import '../../../app/router/routes.dart';
 
 class PaymentFormPage extends StatefulWidget {
   const PaymentFormPage({super.key});
@@ -11,7 +14,8 @@ class PaymentFormPage extends StatefulWidget {
   State<PaymentFormPage> createState() => _PaymentFormPageState();
 }
 
-class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderStateMixin {
+class _PaymentFormPageState extends State<PaymentFormPage>
+    with TickerProviderStateMixin {
   final TextEditingController _phoneController = TextEditingController();
   int _selectedOperator = 0; // 0: Airtel, 1: Moov
   bool _saveForLater = false;
@@ -38,7 +42,7 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => context.pop(),
+                onPressed: Get.back,
               ),
               const Text(
                 "Réglez votre messe avec foi et sécurité",
@@ -57,9 +61,13 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
                 ),
               ),
               const SizedBox(height: 30),
+
+              // ---------------- FORM CARD ----------------
               Card(
                 elevation: 5,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -74,26 +82,31 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
                         ),
                         child: Row(
                           children: [
-                            _buildOperatorTab("airtel", isActive: _selectedOperator == 0, onTap: () {
-                              setState(() => _selectedOperator = 0);
-                            }),
-                            _buildOperatorTab("moov", isActive: _selectedOperator == 1, onTap: () {
-                              setState(() => _selectedOperator = 1);
-                            }),
+                            _buildOperatorTab(
+                              "airtel",
+                              isActive: _selectedOperator == 0,
+                              onTap: () =>
+                                  setState(() => _selectedOperator = 0),
+                            ),
+                            _buildOperatorTab(
+                              "moov",
+                              isActive: _selectedOperator == 1,
+                              onTap: () =>
+                                  setState(() => _selectedOperator = 1),
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
+
                       _buildLabel("Numéro Mobile Money"),
                       TextField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
-                        style: const TextStyle(color: Colors.black, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: "+241 07xx xxx",
                           filled: true,
                           fillColor: Colors.white,
-                          hintStyle: const TextStyle(color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -101,9 +114,11 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
                         ),
                       ),
                       const SizedBox(height: 20),
+
                       _buildLabel("Nom du demandeur"),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 16),
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(12),
@@ -117,12 +132,15 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 20),
+
                       Row(
                         children: [
                           Checkbox(
                             value: _saveForLater,
-                            onChanged: (v) => setState(() => _saveForLater = v ?? false),
+                            onChanged: (v) =>
+                                setState(() => _saveForLater = v ?? false),
                             activeColor: AppColors.navActive,
                           ),
                           const Expanded(
@@ -137,20 +155,27 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
                   ),
                 ),
               ),
+
               const SizedBox(height: 30),
+
+              // ---------------- ACTIONS ----------------
               Row(
                 children: [
                   Expanded(
                     child: TextButton(
-                      onPressed: () => context.pop(),
+                      onPressed: Get.back,
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding:
+                        const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                       child: const Text(
                         "Annuler",
-                        style: TextStyle(color: Colors.black54, fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.black54, fontSize: 16),
                       ),
                     ),
                   ),
@@ -171,16 +196,25 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
     );
   }
 
+  // ----------------------------------------------------------
+
   Widget _buildLabel(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 6.0),
     child: Text(
       text,
-      style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
+      style: const TextStyle(
+        color: Colors.grey,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
     ),
   );
 
-  Widget _buildOperatorTab(String operatorAsset,
-      {required bool isActive, required VoidCallback onTap}) {
+  Widget _buildOperatorTab(
+      String operatorAsset, {
+        required bool isActive,
+        required VoidCallback onTap,
+      }) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -190,7 +224,8 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
             color: isActive ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             border: isActive
-                ? const Border(bottom: BorderSide(color: Color(0xff5722), width: 2))
+                ? const Border(
+                bottom: BorderSide(color: Color(0xff5722), width: 2))
                 : null,
           ),
           child: Center(
@@ -205,10 +240,14 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
     );
   }
 
-  void _handlePayment() async {
+  // ----------------------------------------------------------
+
+  Future<void> _handlePayment() async {
     if (_phoneController.text.trim().length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Numéro invalide")),
+      Get.snackbar(
+        "Numéro invalide",
+        "Veuillez saisir un numéro Mobile Money valide",
+        snackPosition: SnackPosition.BOTTOM,
       );
       return;
     }
@@ -223,57 +262,50 @@ class _PaymentFormPageState extends State<PaymentFormPage> with TickerProviderSt
   void _showSuccessDialog() {
     late final AnimationController controller;
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        controller = AnimationController(vsync: this);
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          titlePadding: const EdgeInsets.all(16),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          actionsPadding: const EdgeInsets.only(bottom: 12, right: 12),
-          title: Column(
-            children: [
-              Lottie.asset(
-                'assets/lottie/success.json',
-                height: 100,
-                controller: controller,
-                onLoaded: (composition) {
-                  controller
-                    ..duration = composition.duration
-                    ..repeat();
-                },
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Paiement confirmé",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ],
-          ),
-          content: const Text(
-            "Merci pour votre contribution.\nVous recevrez un SMS de confirmation dans un instant.",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black87),
-          ),
-          actions: [
-            ElevatedButton.icon(
-              onPressed: () {
-                controller.dispose();
-                context.go('/home');
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16)),
+        title: Column(
+          children: [
+            Lottie.asset(
+              'assets/lottie/success.json',
+              height: 100,
+              controller: controller = AnimationController(vsync: this),
+              onLoaded: (composition) {
+                controller
+                  ..duration = composition.duration
+                  ..repeat();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.navActive,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              icon: const Icon(Icons.home),
-              label: const Text("Retour à l'accueil"),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Paiement confirmé",
+              textAlign: TextAlign.center,
+              style:
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
           ],
-        );
-      },
+        ),
+        content: const Text(
+          "Merci pour votre contribution.\nVous recevrez un SMS de confirmation dans un instant.",
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          ElevatedButton.icon(
+            onPressed: () {
+              controller.dispose();
+              Get.offAllNamed(Routes.home);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.navActive,
+            ),
+            icon: const Icon(Icons.home),
+            label: const Text("Retour à l'accueil"),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
     );
   }
 }

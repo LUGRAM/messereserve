@@ -1,27 +1,39 @@
 class Routes {
-  // Auth + Intro
+  // =====================
+  // AUTH
+  // =====================
   static const splash = '/splash';
   static const onboarding = '/onboarding';
   static const login = '/login';
   static const register = '/register';
 
-  // Home + Navigation
+  // =====================
+  // MAIN
+  // =====================
   static const home = '/home';
   static const payments = '/payments';
   static const support = '/support';
   static const profile = '/profile';
 
-  // Reservations
   static const reservations = '/reservations';
   static const reservationDetail = '/reservation-detail';
 
-  // Masses
-  static const massNuptial = '/mass/nuptiale';
-  static const massHealing = '/mass/guerison';
-  static const massThanksgiving = '/mass/action-grace';
-  static const massRequiem = '/mass/requiem';
+  static const parishes = '/parishes';
+  static const parishDetails = '/parish-details';
 
-  // Paiements
-  static const paymentChoice = '/payment-choice';
+  static const notifications = '/notifications';
+
+  // =====================
+  // STATIC
+  // =====================
+  static const about = '/about';
+  static const privacy = '/privacy';
+  static const terms = '/terms';
+  static const legal = '/legal';
+
+  // =====================
+  // MASS FLOW
+  // =====================
+  static const massDetail = '/mass/:id';
   static const payment = '/payment';
 }

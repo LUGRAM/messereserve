@@ -1,26 +1,31 @@
+// lib/app/widgets/app_drawer.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:messeconnect/app/theme/app_colors.dart';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../app/router/routes.dart';
+import '../../app/theme/app_colors.dart';
+import '../../features/auth/controllers/auth_controller.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
-  Future<void> _open(String url) async {
+  Future<void> _openExternal(String url) async {
     final uri = Uri.parse(url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find<AuthController>();
+
     return Drawer(
       backgroundColor: AppColors.surface,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-
           // ---------------------------------------------------------
-          // 🔹 HEADER
+          // HEADER
           // ---------------------------------------------------------
           UserAccountsDrawerHeader(
             decoration: const BoxDecoration(
@@ -45,7 +50,7 @@ class AppDrawer extends StatelessWidget {
           ),
 
           // ---------------------------------------------------------
-          // 🔹 SECTION : PAROISSES
+          // PAROISSES
           // ---------------------------------------------------------
           _sectionTitle("Paroisses"),
 
@@ -53,8 +58,8 @@ class AppDrawer extends StatelessWidget {
             icon: Icons.location_city_rounded,
             label: "Liste des paroisses",
             onTap: () {
-              Navigator.pop(context);  // ferme drawer
-              context.go("/parishes"); // route go_router
+              Get.back();
+              Get.toNamed(Routes.parishes);
             },
           ),
 
@@ -62,40 +67,40 @@ class AppDrawer extends StatelessWidget {
             icon: Icons.handshake_rounded,
             label: "À propos d’une paroisse",
             onTap: () {
-              Navigator.pop(context);
-              context.go("/parish-details");
+              Get.back();
+              Get.toNamed(Routes.parishDetails);
             },
           ),
 
           const Divider(),
 
           // ---------------------------------------------------------
-          // 🔹 SECTION : APP
+          // APPLICATION
           // ---------------------------------------------------------
           _sectionTitle("Application"),
 
           _item(
             icon: Icons.info_outline_rounded,
             label: "À propos de MesseConnect",
-            onTap: () => _open("https://messeconnect.com/about"),
+            onTap: () => _openExternal("https://messeconnect.com/about"),
           ),
 
           _item(
             icon: Icons.privacy_tip_rounded,
             label: "Politique de confidentialité",
-            onTap: () => _open("https://messeconnect.com/privacy"),
+            onTap: () => _openExternal("https://messeconnect.com/privacy"),
           ),
 
           _item(
             icon: Icons.description_rounded,
             label: "Conditions d’utilisation",
-            onTap: () => _open("https://messeconnect.com/terms"),
+            onTap: () => _openExternal("https://messeconnect.com/terms"),
           ),
 
           _item(
             icon: Icons.gavel_rounded,
             label: "Mentions légales",
-            onTap: () => _open("https://messeconnect.com/legal"),
+            onTap: () => _openExternal("https://messeconnect.com/legal"),
           ),
 
           _item(
@@ -108,15 +113,15 @@ class AppDrawer extends StatelessWidget {
           const Divider(),
 
           // ---------------------------------------------------------
-          // 🔹 DÉCONNEXION
+          // DÉCONNEXION
           // ---------------------------------------------------------
           _item(
             icon: Icons.logout_rounded,
             label: "Se déconnecter",
             color: Colors.red,
             onTap: () {
-              Navigator.pop(context);
-              context.go("/login");
+              Get.back();
+              authController.logout(); // nettoie token + redirection
             },
           ),
 
@@ -126,9 +131,9 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  // ---------------------------------------------------------------------------
+  // ----------------------------------------------------------------
   // UI HELPERS
-  // ---------------------------------------------------------------------------
+  // ----------------------------------------------------------------
 
   Widget _sectionTitle(String title) {
     return Padding(

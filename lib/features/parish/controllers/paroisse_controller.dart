@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../models/paroisse_model.dart';
-import '../services/paroisse_service.dart';
+import '../../masses/services/paroisse_service.dart';
 
 class ParoisseController extends GetxController {
   final _service = ParoisseService();

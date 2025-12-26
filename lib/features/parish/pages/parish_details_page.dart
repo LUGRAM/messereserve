@@ -1,22 +1,31 @@
+// lib/features/parish/pages/parish_details_page.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 
 class ParishDetailsPage extends StatelessWidget {
   const ParishDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final Map parish = Get.arguments ?? {
+      "name": "Paroisse",
+      "city": "—",
+    };
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F8F8),
 
       appBar: AppBar(
-        backgroundColor: Color(0xffe53a5a),
+        backgroundColor: const Color(0xffe53a5a),
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
-          onPressed: () => context.go('/home'),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          onPressed: () => Get.back(),
         ),
-        title: const Text("Détails de la paroisse", style: TextStyle(color: Colors.black)),
+        title: const Text(
+          "Détails de la paroisse",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
 
       body: ListView(
@@ -26,7 +35,6 @@ class ParishDetailsPage extends StatelessWidget {
             height: 180,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: Colors.grey.shade300,
               image: const DecorationImage(
                 image: AssetImage("assets/images/parish.jpg"),
                 fit: BoxFit.cover,
@@ -36,18 +44,33 @@ class ParishDetailsPage extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          const Text("Paroisse Saint Michel",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold,color: Colors.black)),
+          Text(
+            parish["name"],
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
           const SizedBox(height: 6),
-          Text("Libreville, Gabon", style: TextStyle(color: Colors.black)),
+          Text(
+            parish["city"],
+            style: const TextStyle(color: Colors.black54),
+          ),
 
           const SizedBox(height: 20),
 
-          const Text("Informations",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.black)),
+          const Text(
+            "Informations",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
           const SizedBox(height: 12),
 
-          _info(Icons.location_on, "Adresse", "Nkembo , Libreville"),
+          _info(Icons.location_on, "Adresse", "Nkembo, Libreville"),
           _info(Icons.phone, "Téléphone", "+241 01 23 45 67"),
           _info(Icons.schedule, "Horaires", "Lun–Ven : 8h - 17h"),
           _info(Icons.person, "Prêtre responsable", "Père Alain Ndze"),
@@ -66,8 +89,10 @@ class ParishDetailsPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
-              Text(value, style: const TextStyle(color: Colors.black)),
+              Text(label,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black)),
+              Text(value, style: const TextStyle(color: Colors.black54)),
             ],
           )
         ],

@@ -1,7 +1,10 @@
+// lib/features/masses/pages/reservations/reservation_sent_page.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+
 import 'package:messeconnect/app/widgets/gradient_background.dart';
+import 'package:messeconnect/app/router/routes.dart';
 
 class ReservationSentPage extends StatelessWidget {
   final String reference;
@@ -36,7 +39,7 @@ class ReservationSentPage extends StatelessWidget {
 
                   // Animation succès
                   Lottie.asset(
-                    "assets/lottie/check_success.json",
+                    "assets/lottie/success.json",
                     height: size.height * 0.25,
                   ),
 
@@ -44,7 +47,10 @@ class ReservationSentPage extends StatelessWidget {
 
                   Text(
                     "Réservation envoyée",
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -56,7 +62,8 @@ class ReservationSentPage extends StatelessWidget {
                     "Votre demande a bien été enregistrée.\n"
                         "Elle est maintenant en attente de validation par la paroisse.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style:
+                    TextStyle(color: Colors.white70, fontSize: 14),
                   ),
 
                   const SizedBox(height: 30),
@@ -65,7 +72,7 @@ class ReservationSentPage extends StatelessWidget {
 
                   const Spacer(),
 
-                  _buttons(context),
+                  _buttons(),
                 ],
               ),
             ),
@@ -90,7 +97,8 @@ class ReservationSentPage extends StatelessWidget {
           _row("Type de messe", massTitle),
           _row("Date", date),
           _row("Heure", time),
-          if (pastorName != null) _row("Pasteur choisi", pastorName!),
+          if (pastorName != null)
+            _row("Pasteur choisi", pastorName!),
           _row(
             "Statut",
             "En attente de validation",
@@ -101,7 +109,8 @@ class ReservationSentPage extends StatelessWidget {
     );
   }
 
-  Widget _row(String label, String value, {Color valueColor = Colors.white}) {
+  Widget _row(String label, String value,
+      {Color valueColor = Colors.white}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -109,18 +118,20 @@ class ReservationSentPage extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style:
+            const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           Text(
             value,
-            style: TextStyle(color: valueColor, fontSize: 14),
+            style:
+            TextStyle(color: valueColor, fontSize: 14),
           ),
         ],
       ),
     );
   }
 
-  Widget _buttons(BuildContext context) {
+  Widget _buttons() {
     return Column(
       children: [
         SizedBox(
@@ -130,7 +141,8 @@ class ReservationSentPage extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
             ),
-            onPressed: () => context.go('/home'),
+            onPressed: () =>
+                Get.offAllNamed(Routes.home),
             child: const Text("Retour à l'accueil"),
           ),
         ),
@@ -144,7 +156,8 @@ class ReservationSentPage extends StatelessWidget {
               foregroundColor: Colors.white,
               side: const BorderSide(color: Colors.white54),
             ),
-            onPressed: () => context.go('/reservations'),
+            onPressed: () =>
+                Get.toNamed(Routes.reservations),
             child: const Text("Voir mes réservations"),
           ),
         ),

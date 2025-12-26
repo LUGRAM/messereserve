@@ -1,8 +1,7 @@
 // lib/features/splash/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 
 import '../../app/router/routes.dart';
@@ -16,12 +15,28 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  final _storage = GetStorage();
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
+
+    Future.delayed(const Duration(seconds: 2), _handleNavigation);
+  }
+
+  void _handleNavigation() {
+    final bool hasSeenOnboarding =
+        _storage.read('hasSeenOnboarding') ?? false;
+
+    final String? token = _storage.read('auth_token');
+
+    if (!hasSeenOnboarding) {
       Get.offAllNamed(Routes.onboarding);
-    });
+    } else if (token == null || token.isEmpty) {
+      Get.offAllNamed(Routes.login);
+    } else {
+      Get.offAllNamed(Routes.home);
+    }
   }
 
   @override
@@ -49,27 +64,25 @@ class _SplashPageState extends State<SplashPage> {
                     ),
                   ],
                 ),
-                child: const Center(
-                  // Remplace par ton icône croix 3D si besoin (image)
-                  child: Icon(
-                    Icons.church,
-                    color: Colors.amber,
-                    size: 40,
-                  ),
+                child: const Icon(
+                  Icons.church,
+                  color: Colors.amber,
+                  size: 40,
                 ),
               ),
               const SizedBox(height: 24),
               Text(
                 'MesseConnect',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
                 'réserver vos messes sans vous déplacer',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary1.withValues(alpha: 0.9),
+                  color: AppColors.textPrimary1.withOpacity(0.9),
                 ),
               ),
             ],

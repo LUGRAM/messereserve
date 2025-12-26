@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_client.dart';
-import '../models/pastor_model.dart';
+import '../../parish/models/pastor_model.dart';
 
 class PastorService {
   Future<List<PastorModel>> getPastors() async {

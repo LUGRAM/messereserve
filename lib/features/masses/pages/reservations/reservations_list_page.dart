@@ -1,8 +1,11 @@
+// lib/features/masses/pages/reservations/reservations_list_page.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:go_router/go_router.dart';
+
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
+import 'package:messeconnect/app/router/routes.dart';
 
 class ReservationsListPage extends StatefulWidget {
   const ReservationsListPage({super.key});
@@ -37,7 +40,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   }
 
   // ----------------------------------------------------------
-  // BOUTON PAIEMENT
+  // BOUTON / STATUT PAIEMENT
   // ----------------------------------------------------------
   Widget _paymentButton(ReservationModel r) {
     switch (r.status) {
@@ -55,7 +58,10 @@ class _ReservationsListPageState extends State<ReservationsListPage>
           color: Colors.blue,
           icon: Icons.lock_open_rounded,
           enabled: true,
-          onTap: () => context.push('/payment', extra: r),
+          onTap: () => Get.toNamed(
+            Routes.payment,
+            arguments: r,
+          ),
         );
 
       case "paid":
@@ -109,7 +115,10 @@ class _ReservationsListPageState extends State<ReservationsListPage>
         children: [
           Icon(icon, size: 16, color: Colors.white),
           const SizedBox(width: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -119,60 +128,74 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   // CARTE RÉSERVATION
   // ----------------------------------------------------------
   Widget _reservationCard(ReservationModel r) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 8,
-            offset: Offset(0, 3),
-          ),
-        ],
+    return InkWell(
+      onTap: () => Get.toNamed(
+        Routes.reservationDetail,
+        arguments: r,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+        Hero(
+        tag: "church_icon_${r.reference}", // Tag unique indispensable !
+          child: CircleAvatar(
             radius: 26,
             backgroundColor: Colors.orange.withValues(alpha: 0.15),
             child: const Icon(Icons.church, color: Colors.orange),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  r.massTitle,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+        ),
+            /*CircleAvatar(
+              radius: 26,
+              backgroundColor: Colors.orange.withValues(alpha: 0.15),
+              child: const Icon(Icons.church, color: Colors.orange),
+            ),*/
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    r.massTitle,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "${r.date} à ${r.time}",
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.black54,
+                  const SizedBox(height: 4),
+                  Text(
+                    "${r.date} à ${r.time}",
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black54,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          _paymentButton(r),
-        ],
+            _paymentButton(r),
+          ],
+        ),
       ),
     );
   }
 
   // ----------------------------------------------------------
-  // CORPS
+  // BUILD
   // ----------------------------------------------------------
   @override
   Widget build(BuildContext context) {
@@ -196,7 +219,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
             controller: _tabController,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white60,
-            indicatorColor: Colors.deepOrangeAccent,
+            indicatorColor: Colors.white70,
             tabs: const [
               Tab(text: "Demandes"),
               Tab(text: "Succès"),
@@ -215,7 +238,10 @@ class _ReservationsListPageState extends State<ReservationsListPage>
             : TabBarView(
           controller: _tabController,
           children: [
-            _buildTab(_filterMultiple(["pending_validation", "pending_payment"])),
+            _buildTab(
+              _filterMultiple(
+                  ["pending_validation", "pending_payment"]),
+            ),
             _buildTab(_filterMultiple(["paid"])),
             _buildTab(_filterMultiple(["rejected"])),
           ],
@@ -223,7 +249,6 @@ class _ReservationsListPageState extends State<ReservationsListPage>
       ),
     );
   }
-
 
   Widget _buildTab(List<ReservationModel> list) {
     if (list.isEmpty) {

@@ -15,7 +15,43 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  // 🔹 Mapping route -> index
+  int _indexFromRoute(String route) {
+    if (route.startsWith(Routes.home)) return 0;
+    if (route.startsWith(Routes.payments)) return 1;
+    if (route.startsWith(Routes.support)) return 2;
+    if (route.startsWith(Routes.profile)) return 3;
+    return 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = _indexFromRoute(Get.currentRoute);
+  }
+
+  void _onTap(int index) {
+    if (_currentIndex == index) return;
+
+    setState(() => _currentIndex = index);
+
+    switch (index) {
+      case 0:
+        Get.offAllNamed(Routes.home);
+        break;
+      case 1:
+        Get.offAllNamed(Routes.payments);
+        break;
+      case 2:
+        Get.offAllNamed(Routes.support);
+        break;
+      case 3:
+        Get.offAllNamed(Routes.profile);
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +65,7 @@ class _MainNavigationState extends State<MainNavigation> {
         unselectedItemColor: AppColors.navInactive,
         showSelectedLabels: true,
         showUnselectedLabels: false,
-        onTap: (i) {
-          setState(() => _currentIndex = i);
-
-          switch (i) {
-            case 0:
-              Get.offAllNamed(Routes.home);
-              break;
-            case 1:
-              Get.offAllNamed(Routes.payments);
-              break;
-            case 2:
-              Get.offAllNamed(Routes.support);
-              break;
-            case 3:
-              Get.offAllNamed(Routes.profile);
-              break;
-          }
-        },
+        onTap: _onTap,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_rounded),

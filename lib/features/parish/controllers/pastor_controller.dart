@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import '../models/pastor_model.dart';
-import '../services/pastor_service.dart';
+import '../../masses/services/pastor_service.dart';
 
 class PastorController extends GetxController {
   final _service = PastorService();

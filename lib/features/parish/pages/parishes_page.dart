@@ -1,5 +1,8 @@
+// lib/features/parish/pages/parishes_page.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+
+import '../../../app/router/routes.dart';
 
 class ParishesPage extends StatelessWidget {
   const ParishesPage({super.key});
@@ -21,7 +24,7 @@ class ParishesPage extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
-          onPressed: () => context.go('/home'),   // ← correction importante
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           "Paroisses",
@@ -33,7 +36,7 @@ class ParishesPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         itemCount: parishes.length,
         separatorBuilder: (_, __) => const Divider(),
-        itemBuilder: (context, i) {
+        itemBuilder: (_, i) {
           final p = parishes[i];
 
           return ListTile(
@@ -49,8 +52,12 @@ class ParishesPage extends StatelessWidget {
             subtitle: Text(p["city"]!),
             trailing: const Icon(Icons.chevron_right_rounded),
 
-            // ouvrir la page de détails via GoRouter
-            onTap: () => context.push("/parish-details"),
+            onTap: () {
+              Get.toNamed(
+                Routes.parishDetails,
+                arguments: p, //  passage dynamique
+              );
+            },
           );
         },
       ),

@@ -1,8 +1,7 @@
 // lib/features/onboarding/onboarding_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 
 import '../../app/router/routes.dart';
@@ -17,6 +16,8 @@ class OnboardingPage extends StatefulWidget {
 
 class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _controller = PageController();
+  final _storage = GetStorage();
+
   int _index = 0;
 
   final List<_OnboardData> _pages = const [
@@ -27,15 +28,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
     ),
     _OnboardData(
       title: 'Intention & bénéficiaire',
-      subtitle: 'Indiquez vos intentions et les personnes\npour qui la messe est célébrée.',
+      subtitle:
+      'Indiquez vos intentions et les personnes\npour qui la messe est célébrée.',
       icon: Icons.favorite,
     ),
     _OnboardData(
       title: 'Paiement sécurisé',
-      subtitle: 'Réglez vos offrandes en toute sécurité\nvia mobile ou carte.',
+      subtitle:
+      'Réglez vos offrandes en toute sécurité\nvia mobile ou carte.',
       icon: Icons.lock_outline,
     ),
   ];
+
+  void _completeOnboarding() {
+    _storage.write('hasSeenOnboarding', true);
+    Get.offAllNamed(Routes.login);
+  }
 
   void _goNext() {
     if (_index < _pages.length - 1) {
@@ -44,8 +52,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         curve: Curves.easeOut,
       );
     } else {
-      // TODO: marquer onboarding vu dans SharedPreferences
-      Get.offAllNamed(Routes.login);
+      _completeOnboarding();
     }
   }
 
@@ -62,8 +69,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: () => Get.offAllNamed(Routes.login),
-                    child: const Text('Passer', style: TextStyle(color: Colors.white)),
+                    onPressed: _completeOnboarding,
+                    child: const Text(
+                      'Passer',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -100,17 +110,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           Text(
                             data.title,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             data.subtitle,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.white70,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: Colors.white70),
                           ),
                         ],
                       );
@@ -138,7 +150,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _goNext,
-                    child: Text(_index == _pages.length - 1 ? 'Commencer' : 'Suivant'),
+                    child: Text(
+                      _index == _pages.length - 1
+                          ? 'Commencer'
+                          : 'Suivant',
+                    ),
                   ),
                 ),
               ],

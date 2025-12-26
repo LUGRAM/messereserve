@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiClient {
-  static const String baseUrl = "http://192.168.1.64:8080/api";
+  static const String baseUrl = "https://admin.itmaster-africa.com/api";
 
   /// Headers par défaut
   static Map<String, String> headers = {

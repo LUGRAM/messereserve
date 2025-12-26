@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/paroisse_model.dart';
+import '../../parish/models/paroisse_model.dart';
 
 class ParoisseSelectorForm extends StatelessWidget {
   final ParoisseModel? selected;

@@ -21,7 +21,7 @@ final List<MassModel> mockMasses = [
     heroTag: "messe_action_grace",
     accentColor: const Color(0xFFEF5350),
     lottieAsset: "assets/lottie/thanks.json",
-    requiresBeneficiary: false,
+    requiresBeneficiary: true,
   ),
 
   MassModel(
@@ -31,8 +31,8 @@ final List<MassModel> mockMasses = [
     imageAsset: "assets/images/masses/guerison.jpg",
     heroTag: "messe_guerison",
     accentColor: const Color(0xFF66BB6A),
-    lottieAsset: "assets/lottie/health.json",
-    requiresBeneficiary: false,
+    lottieAsset: "assets/lottie/healing.json",
+    requiresBeneficiary: true,
   ),
 
   MassModel(
@@ -41,9 +41,9 @@ final List<MassModel> mockMasses = [
     subtitle: "Union sacrée",
     imageAsset: "assets/images/masses/nuptial.jpg",
     heroTag: "messe_nuptiale",
-    accentColor: const Color(0xFF5C6BC0),
-    lottieAsset: "assets/lottie/wedding.json",
-    requiresBeneficiary: false,
+    accentColor: const Color(0xFFFFFFFF),
+    lottieAsset: "assets/lottie/rings.json",
+    requiresBeneficiary: true,
   ),
 
 ];

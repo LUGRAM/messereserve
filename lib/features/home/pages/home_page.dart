@@ -1,9 +1,12 @@
+// lib/features/home/pages/home_page.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/app/widgets/service_card.dart';
 import 'package:messeconnect/features/masses/models/mass_model.dart';
 import 'package:messeconnect/features/masses/services/mass_service.dart';
+import 'package:messeconnect/app/router/routes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // -----------------------------------------------------------
-  // 🔹 HEADER : titre + menu + search + notifications
+  // 🔹 HEADER
   // -----------------------------------------------------------
   Widget _buildHeader(BuildContext context) {
     return Column(
@@ -40,30 +43,25 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(width: 6),
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  // À valider avec le tuteur
-                },
-                child: Container(
-                  height: 38,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.grey.shade600),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Rechercher une messe...",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
-                        ),
+              child: Container(
+                height: 38,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: Colors.grey.shade600),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Rechercher une messe...",
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -74,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
                 size: 26,
               ),
-              onPressed: () => context.push("/notifications"),
+              onPressed: () => Get.toNamed(Routes.notifications),
             ),
           ],
         )
@@ -83,7 +81,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // -------------------------------------------------------------------
-  // PAGE BUILD
+  // BUILD
   // -------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
@@ -107,7 +105,8 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
+                        child:
+                        CircularProgressIndicator(color: Colors.white),
                       );
                     }
 
@@ -120,14 +119,17 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSpacing: 18,
                       children: masses.map((m) {
                         return ServiceCard(
-                          key: ValueKey("card_${m.id}"),
-                          title: m.title,
-                          heroTag: m.heroTag,
-                          imageAsset: m.imageAsset,
-                          borderColor: m.accentColor,
-                          onTap: () {
-                            context.push('/mass/${m.id}', extra: m);
-                          },
+                            key: ValueKey("card_${m.id}"),
+                            title: m.title,
+                            heroTag: m.heroTag,
+                            imageAsset: m.imageAsset,
+                            borderColor: m.accentColor,
+                            onTap: () {
+                              Get.toNamed(
+                                Routes.massDetail.replaceFirst(':id', m.id),
+                              );
+                            }
+
                         );
                       }).toList(),
                     );
@@ -146,7 +148,8 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  onPressed: () => context.push('/reservations'),
+                  onPressed: () =>
+                      Get.toNamed(Routes.reservations),
                   child: Text(
                     'Voir mes réservations',
                     style: Theme.of(context)

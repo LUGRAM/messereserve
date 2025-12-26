@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/pastor_controller.dart';
+import '../../parish/controllers/pastor_controller.dart';
 
 class PastorSelector extends StatelessWidget {
   const PastorSelector({super.key});

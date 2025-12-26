@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
-import '../models/paroisse_model.dart';
+import '../../parish/models/paroisse_model.dart';
 
 class ParoisseService {
   Future<List<ParoisseModel>> getParoisses() async {

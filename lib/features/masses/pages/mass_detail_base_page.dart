@@ -1,9 +1,10 @@
+// lib/features/masses/pages/mass_detail_base_page.dart
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:messeconnect/features/masses/widgets/mass_stepper_form.dart';
 
-import '../../../app/theme/app_colors.dart';
+import 'package:messeconnect/features/masses/widgets/mass_stepper_form.dart';
+import '../../../app/router/routes.dart';
 import '../models/mass_model.dart';
 
 class MassDetailBasePage extends StatelessWidget {
@@ -41,14 +42,21 @@ class MassDetailBasePage extends StatelessWidget {
     );
   }
 
+  void _handleBack() {
+    if (Get.previousRoute.isNotEmpty) {
+      Get.back();
+    } else {
+      Get.offAllNamed(Routes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-
-          // HERO — PREMIÈRE COUCHE (ANTI FLASH)
+          // HERO — IMAGE
           Positioned.fill(
             child: Hero(
               tag: heroTag,
@@ -66,25 +74,6 @@ class MassDetailBasePage extends StatelessWidget {
             ),
           ),
 
-          // GRADIENT (APRÈS LE HERO)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent
-                      //accentColor.withValues(alpha: 0.35),
-                      //AppColors.massRedBottom,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
           // CONTENU
           SafeArea(
             child: LayoutBuilder(
@@ -92,27 +81,23 @@ class MassDetailBasePage extends StatelessWidget {
                 return SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints:
+                    BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-
                             // HEADER
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                                  onPressed: () {
-                                    if (GoRouter.of(context).canPop()) {
-                                      context.pop();
-                                    } else {
-                                      context.go('/home');
-                                    }
-                                  },
+                                  icon: const Icon(Icons.arrow_back,
+                                      color: Colors.white),
+                                  onPressed: _handleBack,
                                 ),
                                 Text(
                                   title,
@@ -128,16 +113,16 @@ class MassDetailBasePage extends StatelessWidget {
 
                             const SizedBox(height: 20),
 
-                            // BLOC BLANC FLOUTÉ
+                            // BLOC CONTENU
                             Container(
                               padding: const EdgeInsets.all(18),
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(40, 255, 255, 255),
+                                color: const Color.fromARGB(
+                                    40, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(22),
                               ),
                               child: Column(
                                 children: [
-
                                   Text(
                                     subtitle,
                                     textAlign: TextAlign.center,
@@ -161,7 +146,8 @@ class MassDetailBasePage extends StatelessWidget {
                                   MassStepperForm(
                                     accentColor: accentColor,
                                     massTitle: massTitle,
-                                    requiresBeneficiary: requiresBeneficiary,
+                                    requiresBeneficiary:
+                                    requiresBeneficiary,
                                   ),
                                 ],
                               ),

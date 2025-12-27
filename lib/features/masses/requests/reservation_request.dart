@@ -1,12 +1,23 @@
 class ReservationRequest {
+  // ===== Messe =====
   final int massServiceId;
+  final String scheduledDate;
+  final String scheduledTime;
 
-  final String scheduledDate; // YYYY-MM-DD
-  final String scheduledTime; // HH:mm
-
+  // ===== Lieux =====
+  final int paroisseId;
   final int? pastorId;
-  final String? beneficiary;
-  final int paroisseId;       // obligatoire
+
+  // ===== Demandeur =====
+  final String requesterNom;
+  final String requesterPrenom;
+  final String requesterNationalite;
+  final String requesterTelephone;
+
+  // ===== Bénéficiaire =====
+  final String? beneficiaryNom;
+  final String? beneficiaryPrenom;
+  final String? beneficiaryDateDeces; // YYYY-MM-DD (REQUiem)
 
   ReservationRequest({
     required this.massServiceId,
@@ -14,7 +25,15 @@ class ReservationRequest {
     required this.scheduledTime,
     required this.paroisseId,
     this.pastorId,
-    this.beneficiary,
+
+    required this.requesterNom,
+    required this.requesterPrenom,
+    required this.requesterNationalite,
+    required this.requesterTelephone,
+
+    this.beneficiaryNom,
+    this.beneficiaryPrenom,
+    this.beneficiaryDateDeces,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,9 +41,24 @@ class ReservationRequest {
       "mass_service_id": massServiceId,
       "scheduled_date": scheduledDate,
       "scheduled_time": scheduledTime,
+
+      "paroisse_id": paroisseId,
       "pastor_id": pastorId,
-      "beneficiary": beneficiary,
-      "paroisse_id": paroisseId
+
+      "requester": {
+        "nom": requesterNom,
+        "prenom": requesterPrenom,
+        "nationalite": requesterNationalite,
+        "telephone": requesterTelephone,
+      },
+
+      "beneficiary": beneficiaryNom != null
+          ? {
+        "nom": beneficiaryNom,
+        "prenom": beneficiaryPrenom,
+        "date_deces": beneficiaryDateDeces,
+      }
+          : null,
     };
   }
 }

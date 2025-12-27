@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../controllers/reservation_status.dart';
-import '../../parish/models/pastor_model.dart';
-import '../../parish/models/paroisse_model.dart';
-import '../requests/reservation_request.dart';
-import '../pages/reservations/reservation_loading_page.dart';
-import '../pages/reservations/reservation_sent_page.dart';
-import '../widgets/pastor_selector.dart';
-
 import '../controllers/reservation_controller.dart';
 import '../../parish/controllers/paroisse_controller.dart';
 import '../../parish/controllers/pastor_controller.dart';
+
+import '../../parish/models/paroisse_model.dart';
+import '../../parish/models/pastor_model.dart';
+
+import '../requests/reservation_request.dart';
+import '../pages/reservations/reservation_loading_page.dart';
+import '../widgets/pastor_selector.dart';
 
 class MassStepperForm extends StatefulWidget {
   final Color accentColor;
@@ -33,7 +32,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
 
-  // Controllers
+  // Controllers GetX
   final ParoisseController _paroisseCtrl = Get.find();
   final PastorController _pastorCtrl = Get.find();
   final ReservationController _reservationCtrl = Get.find();
@@ -49,7 +48,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final _nationaliteCtrl = TextEditingController();
   final _telephoneCtrl = TextEditingController();
 
-  // Bénéficiaire (requiem)
+  // Bénéficiaire (Requiem)
   final _benefNomCtrl = TextEditingController();
   final _benefPrenomCtrl = TextEditingController();
   DateTime? _benefDateDeces;
@@ -72,19 +71,24 @@ class _MassStepperFormState extends State<MassStepperForm> {
     super.dispose();
   }
 
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
   // UI HELPERS
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
 
   Widget _fieldContainer({required Widget child}) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      constraints: const BoxConstraints(minHeight: 56),
+      alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.3)),
+        color: Colors.white.withOpacity(0.18),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.35),
+          width: 1,
+        ),
       ),
       child: child,
     );
@@ -97,9 +101,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
     errorStyle: const TextStyle(height: 0),
   );
 
-  // ---------------------------------------------------------------------------
-  // VALIDATION
-  // ---------------------------------------------------------------------------
+
+  // ===========================================================================
+  // VALIDATIONS
+  // ===========================================================================
 
   bool _validateStep0() {
     if (_selectedParoisse == null) {
@@ -117,16 +122,21 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
   bool _validateStep2() {
     if (!widget.requiresBeneficiary) return true;
+
     if (_benefNomCtrl.text.trim().isEmpty) {
-      Get.snackbar("Bénéficiaire requis", "Nom du bénéficiaire obligatoire");
+      Get.snackbar("Bénéficiaire requis", "Nom du défunt obligatoire");
+      return false;
+    }
+    if (_benefDateDeces == null) {
+      Get.snackbar("Date manquante", "Date du décès obligatoire");
       return false;
     }
     return true;
   }
 
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
   // PICKERS
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
 
   Future<void> _chooseParoisse() async {
     final p = await showModalBottomSheet<ParoisseModel>(
@@ -159,12 +169,11 @@ class _MassStepperFormState extends State<MassStepperForm> {
   }
 
   Future<void> _pickDateTime() async {
-    final now = DateTime.now();
     final d = await showDatePicker(
       context: context,
-      initialDate: now,
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 365)),
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (d == null) return;
 
@@ -179,33 +188,49 @@ class _MassStepperFormState extends State<MassStepperForm> {
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // SUBMIT (ATTENTE SERVEUR)
-  // ---------------------------------------------------------------------------
+  Future<void> _pickDateDeces() async {
+    final d = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 1)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (d != null) setState(() => _benefDateDeces = d);
+  }
+
+  // ===========================================================================
+  // SUBMIT
+  // ===========================================================================
 
   Future<void> _submit() async {
     final req = ReservationRequest(
       massServiceId: 1,
-      paroisseId: _selectedParoisse!.id,
-      pastorId: _selectedPastor?.id,
-      beneficiary:
-      widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null,
       scheduledDate:
       "${_dateTime!.year}-${_dateTime!.month}-${_dateTime!.day}",
       scheduledTime:
       "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
+      paroisseId: _selectedParoisse!.id,
+      pastorId: _selectedPastor?.id,
+      requesterNom: _nomCtrl.text.trim(),
+      requesterPrenom: _prenomCtrl.text.trim(),
+      requesterNationalite: _nationaliteCtrl.text.trim(),
+      requesterTelephone: _telephoneCtrl.text.trim(),
+      beneficiaryNom:
+      widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null,
+      beneficiaryPrenom:
+      widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null,
+      beneficiaryDateDeces: widget.requiresBeneficiary
+          ? "${_benefDateDeces!.year}-${_benefDateDeces!.month}-${_benefDateDeces!.day}"
+          : null,
     );
 
-    // Lance la requête
     _reservationCtrl.submitReservation(req);
-
-    // Va sur la page d'attente
     Get.to(() => ReservationLoadingPage());
   }
 
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
   // BUILD
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -213,8 +238,8 @@ class _MassStepperFormState extends State<MassStepperForm> {
       key: _formKey,
       child: Column(
         children: [
-          _buildStepHeader(),
-          const SizedBox(height: 8),
+          _buildHeader(),
+          const SizedBox(height: 12),
           if (_currentStep == 0) _buildStep0(),
           if (_currentStep == 1) _buildStep1(),
           if (_currentStep == 2) _buildStep2(),
@@ -226,11 +251,11 @@ class _MassStepperFormState extends State<MassStepperForm> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // HEADER
-  // ---------------------------------------------------------------------------
+  // ===========================================================================
+  // STEPS UI
+  // ===========================================================================
 
-  Widget _buildStepHeader() {
+  Widget _buildHeader() {
     const labels = ["Infos", "Demandeur", "Bénéficiaire", "Résumé"];
     return Row(
       children: List.generate(4, (i) {
@@ -256,10 +281,6 @@ class _MassStepperFormState extends State<MassStepperForm> {
       }),
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // STEPS CONTENT
-  // ---------------------------------------------------------------------------
 
   Widget _buildStep0() => Column(children: [
     _fieldContainer(
@@ -298,8 +319,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       child: TextFormField(
         controller: _nomCtrl,
         decoration: _input("Nom"),
-        validator: (v) =>
-        v == null || v.isEmpty ? "Champ obligatoire" : null,
+        validator: (v) => v!.isEmpty ? "Obligatoire" : null,
         style: const TextStyle(color: Colors.white),
       ),
     ),
@@ -307,8 +327,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       child: TextFormField(
         controller: _prenomCtrl,
         decoration: _input("Prénom"),
-        validator: (v) =>
-        v == null || v.isEmpty ? "Champ obligatoire" : null,
+        validator: (v) => v!.isEmpty ? "Obligatoire" : null,
         style: const TextStyle(color: Colors.white),
       ),
     ),
@@ -316,8 +335,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       child: TextFormField(
         controller: _nationaliteCtrl,
         decoration: _input("Nationalité"),
-        validator: (v) =>
-        v == null || v.isEmpty ? "Champ obligatoire" : null,
+        validator: (v) => v!.isEmpty ? "Obligatoire" : null,
         style: const TextStyle(color: Colors.white),
       ),
     ),
@@ -325,9 +343,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       child: TextFormField(
         controller: _telephoneCtrl,
         decoration: _input("Téléphone"),
-        keyboardType: TextInputType.phone,
-        validator: (v) =>
-        v == null || v.isEmpty ? "Champ obligatoire" : null,
+        validator: (v) => v!.isEmpty ? "Obligatoire" : null,
         style: const TextStyle(color: Colors.white),
       ),
     ),
@@ -342,51 +358,54 @@ class _MassStepperFormState extends State<MassStepperForm> {
       _fieldContainer(
         child: TextFormField(
           controller: _benefNomCtrl,
-          decoration: _input("Nom du bénéficiaire"),
+          decoration: _input("Nom du défunt"),
           style: const TextStyle(color: Colors.white),
         ),
       ),
       _fieldContainer(
         child: TextFormField(
           controller: _benefPrenomCtrl,
-          decoration: _input("Prénom du bénéficiaire"),
+          decoration: _input("Prénom du défunt"),
           style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      _fieldContainer(
+        child: InkWell(
+          onTap: _pickDateDeces,
+          child: Text(
+            _benefDateDeces == null
+                ? "Date du décès"
+                : "${_benefDateDeces!.day}/${_benefDateDeces!.month}/${_benefDateDeces!.year}",
+            style: const TextStyle(color: Colors.white),
+          ),
         ),
       ),
     ]);
   }
 
-  Widget _buildStep3() {
-    Widget row(String l, String v) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-              child: Text(l,
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 13))),
-          Expanded(
-              child: Text(v,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600))),
-        ],
-      ),
-    );
+  Widget _buildStep3() => Column(children: [
+    _summaryRow("Type", widget.massTitle),
+    _summaryRow("Paroisse", _selectedParoisse?.nom ?? "—"),
+    _summaryRow("Date", _dateTime.toString()),
+    _summaryRow("Demandeur", "${_nomCtrl.text} ${_prenomCtrl.text}"),
+  ]);
 
-    return Column(children: [
-      row("Type", widget.massTitle),
-      row("Paroisse", _selectedParoisse?.nom ?? "—"),
-      row("Date", _dateTime.toString()),
-      row("Nom", _nomCtrl.text),
-      row("Téléphone", _telephoneCtrl.text),
-    ]);
-  }
-
-  // ---------------------------------------------------------------------------
-  // BUTTONS
-  // ---------------------------------------------------------------------------
+  Widget _summaryRow(String l, String v) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Expanded(
+            child: Text(l,
+                style:
+                const TextStyle(color: Colors.white70, fontSize: 13))),
+        Expanded(
+            child: Text(v,
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w600))),
+      ],
+    ),
+  );
 
   Widget _buildButtons() {
     return Row(children: [
@@ -394,8 +413,8 @@ class _MassStepperFormState extends State<MassStepperForm> {
         Expanded(
           child: OutlinedButton(
             onPressed: () => setState(() => _currentStep--),
-            child:
-            const Text("Précédent", style: TextStyle(color: Colors.white)),
+            child: const Text("Précédent",
+                style: TextStyle(color: Colors.white)),
           ),
         ),
       if (_currentStep > 0) const SizedBox(width: 12),
@@ -403,11 +422,11 @@ class _MassStepperFormState extends State<MassStepperForm> {
         child: ElevatedButton(
           onPressed: () {
             if (_currentStep == 0 && _validateStep0()) {
-              setState(() => _currentStep = 1);
+              setState(() => _currentStep++);
             } else if (_currentStep == 1 && _validateStep1()) {
-              setState(() => _currentStep = 2);
+              setState(() => _currentStep++);
             } else if (_currentStep == 2 && _validateStep2()) {
-              setState(() => _currentStep = 3);
+              setState(() => _currentStep++);
             } else if (_currentStep == 3) {
               _submit();
             }

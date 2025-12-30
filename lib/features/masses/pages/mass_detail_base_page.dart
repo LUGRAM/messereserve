@@ -17,7 +17,7 @@ class MassDetailBasePage extends StatelessWidget {
   final String massTitle;
   final bool requiresBeneficiary;
 
-  const MassDetailBasePage({
+  MassDetailBasePage({
     super.key,
     required this.heroTag,
     required this.imageAsset,
@@ -49,6 +49,8 @@ class MassDetailBasePage extends StatelessWidget {
       Get.offAllNamed(Routes.home);
     }
   }
+
+  final String massId = Get.parameters['id'] ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -144,11 +146,12 @@ class MassDetailBasePage extends StatelessWidget {
                                   const SizedBox(height: 6),
 
                                   MassStepperForm(
+                                    id: massId,
                                     accentColor: accentColor,
                                     massTitle: massTitle,
                                     requiresBeneficiary:
                                     requiresBeneficiary,
-                                  ),
+                                                                      ),
                                 ],
                               ),
                             ),

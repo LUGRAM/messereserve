@@ -13,12 +13,14 @@ import '../pages/reservations/reservation_loading_page.dart';
 import '../widgets/pastor_selector.dart';
 
 class MassStepperForm extends StatefulWidget {
+  final String id;
   final Color accentColor;
   final String massTitle;
   final bool requiresBeneficiary;
 
   const MassStepperForm({
     super.key,
+    required this.id,
     required this.accentColor,
     required this.massTitle,
     required this.requiresBeneficiary,
@@ -79,14 +81,14 @@ class _MassStepperFormState extends State<MassStepperForm> {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
       constraints: const BoxConstraints(minHeight: 56),
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.18),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.white.withOpacity(0.35),
+          color: Colors.white.withValues(alpha: 0.35),
           width: 1,
         ),
       ),
@@ -95,11 +97,19 @@ class _MassStepperFormState extends State<MassStepperForm> {
   }
 
   InputDecoration _input(String hint) => InputDecoration(
+    filled: false,
+    fillColor: Colors.transparent,
+
     border: InputBorder.none,
+    enabledBorder: InputBorder.none,
+    focusedBorder: InputBorder.none,
+    errorBorder: InputBorder.none,
+    focusedErrorBorder: InputBorder.none,
+
     hintText: hint,
-    hintStyle: const TextStyle(color: Colors.white70),
-    errorStyle: const TextStyle(height: 0),
+
   );
+
 
 
   // ===========================================================================
@@ -124,11 +134,12 @@ class _MassStepperFormState extends State<MassStepperForm> {
     if (!widget.requiresBeneficiary) return true;
 
     if (_benefNomCtrl.text.trim().isEmpty) {
-      Get.snackbar("Bénéficiaire requis", "Nom du défunt obligatoire");
+      Get.snackbar("Bénéficiaire requis","Nom du défunt obligatoire");
       return false;
     }
-    if (_benefDateDeces == null) {
-      Get.snackbar("Date manquante", "Date du décès obligatoire");
+
+    if (_benefDateDeces == null && widget.id =='requiem') {
+      Get.snackbar("Date manquante","Date du décès obligatoire");
       return false;
     }
     return true;
@@ -203,31 +214,34 @@ class _MassStepperFormState extends State<MassStepperForm> {
   // ===========================================================================
 
   Future<void> _submit() async {
+    // 1. On prépare la date de décès de manière sécurisée
+    String? formattedDateDeces;
+    if (widget.requiresBeneficiary && _benefDateDeces != null) {
+      formattedDateDeces = "${_benefDateDeces!.year}-${_benefDateDeces!.month.toString().padLeft(2, '0')}-${_benefDateDeces!.day.toString().padLeft(2, '0')}";
+    }
+
     final req = ReservationRequest(
       massServiceId: 1,
-      scheduledDate:
-      "${_dateTime!.year}-${_dateTime!.month}-${_dateTime!.day}",
-      scheduledTime:
-      "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
+      scheduledDate: "${_dateTime!.year}-${_dateTime!.month}-${_dateTime!.day}",
+      scheduledTime: "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
       paroisseId: _selectedParoisse!.id,
       pastorId: _selectedPastor?.id,
       requesterNom: _nomCtrl.text.trim(),
       requesterPrenom: _prenomCtrl.text.trim(),
       requesterNationalite: _nationaliteCtrl.text.trim(),
       requesterTelephone: _telephoneCtrl.text.trim(),
-      beneficiaryNom:
-      widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null,
-      beneficiaryPrenom:
-      widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null,
-      beneficiaryDateDeces: widget.requiresBeneficiary
-          ? "${_benefDateDeces!.year}-${_benefDateDeces!.month}-${_benefDateDeces!.day}"
-          : null,
+      beneficiaryNom: widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null,
+      beneficiaryPrenom: widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null,
+      // Utilise la variable sécurisée ici
+      beneficiaryDateDeces: formattedDateDeces,
     );
 
-    _reservationCtrl.submitReservation(req);
+    // Naviguer vers la page de loading
     Get.to(() => ReservationLoadingPage());
-  }
 
+    _reservationCtrl.resetStatus();
+    _reservationCtrl.submitReservation(req);
+  }
   // ===========================================================================
   // BUILD
   // ===========================================================================
@@ -350,45 +364,130 @@ class _MassStepperFormState extends State<MassStepperForm> {
   ]);
 
   Widget _buildStep2() {
-    if (!widget.requiresBeneficiary) {
-      return const Text("Aucun bénéficiaire requis",
-          style: TextStyle(color: Colors.white70));
-    }
-    return Column(children: [
-      _fieldContainer(
-        child: TextFormField(
-          controller: _benefNomCtrl,
-          decoration: _input("Nom du défunt"),
-          style: const TextStyle(color: Colors.white),
+    bool isRequiem = widget.id.trim().toLowerCase() == "requiem";
+
+    return Column(
+      children: [
+        _fieldContainer(
+          child: TextFormField(
+            controller: _benefNomCtrl,
+            decoration: _input(isRequiem ? "Nom du défunt" : "Nom du bénéficiaire"),
+            style: const TextStyle(color: Colors.white),
+            validator: (v) => v == null || v.isEmpty ? "Champ obligatoire" : null,
+          ),
         ),
-      ),
-      _fieldContainer(
-        child: TextFormField(
-          controller: _benefPrenomCtrl,
-          decoration: _input("Prénom du défunt"),
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      _fieldContainer(
-        child: InkWell(
-          onTap: _pickDateDeces,
-          child: Text(
-            _benefDateDeces == null
-                ? "Date du décès"
-                : "${_benefDateDeces!.day}/${_benefDateDeces!.month}/${_benefDateDeces!.year}",
+        _fieldContainer(
+          child: TextFormField(
+            controller: _benefPrenomCtrl,
+            decoration: _input(isRequiem ? "Prénom du défunt" : "Prénom du bénéficiaire"),
             style: const TextStyle(color: Colors.white),
           ),
         ),
-      ),
-    ]);
+        // On n'affiche le sélecteur de date QUE pour le requiem
+        if (isRequiem)
+          _fieldContainer(
+            child: InkWell(
+              onTap: _pickDateDeces,
+              child: Text(
+                _benefDateDeces == null
+                    ? "Date du décès"
+                    : "${_benefDateDeces!.day}/${_benefDateDeces!.month}/${_benefDateDeces!.year}",
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+      ],
+    );
   }
+  Widget _buildStep3() {
+    String formatDate(DateTime? d) {
+      if (d == null) return "—";
+      return "${d.day.toString().padLeft(2, '0')}/"
+          "${d.month.toString().padLeft(2, '0')}/"
+          "${d.year}";
+    }
 
-  Widget _buildStep3() => Column(children: [
-    _summaryRow("Type", widget.massTitle),
-    _summaryRow("Paroisse", _selectedParoisse?.nom ?? "—"),
-    _summaryRow("Date", _dateTime.toString()),
-    _summaryRow("Demandeur", "${_nomCtrl.text} ${_prenomCtrl.text}"),
-  ]);
+    String formatTime(DateTime? d) {
+      if (d == null) return "—";
+      return "${d.hour.toString().padLeft(2, '0')}:"
+          "${d.minute.toString().padLeft(2, '0')}";
+    }
+
+    return Column(
+      children: [
+        _summaryRow("Type de messe", widget.massTitle),
+
+        const SizedBox(height: 6),
+
+        _summaryRow(
+          "Paroisse",
+          _selectedParoisse?.nom ?? "—",
+        ),
+
+        _summaryRow(
+          "Date",
+          formatDate(_dateTime),
+        ),
+
+        _summaryRow(
+          "Heure",
+          formatTime(_dateTime),
+        ),
+
+        _summaryRow(
+          "Pasteur",
+          _selectedPastor?.nom ?? "Non spécifié",
+        ),
+
+        const Divider(color: Colors.white24, height: 20),
+
+        _summaryRow(
+          "Demandeur",
+          "${_nomCtrl.text} ${_prenomCtrl.text}",
+        ),
+
+        _summaryRow(
+          "Nationalité",
+          _nationaliteCtrl.text.isNotEmpty
+              ? _nationaliteCtrl.text
+              : "—",
+        ),
+
+        _summaryRow(
+          "Téléphone",
+          _telephoneCtrl.text.isNotEmpty
+              ? _telephoneCtrl.text
+              : "—",
+        ),
+
+        const Divider(color: Colors.white24, height: 20),
+
+        // ============================
+        // CAS REQUIEM → DÉFUNT
+        // ============================
+        if (widget.id == "requiem") ...[
+          _summaryRow(
+            "Défunt",
+            "${_benefNomCtrl.text} ${_benefPrenomCtrl.text}".trim(),
+          ),
+          _summaryRow(
+            "Date du décès",
+            formatDate(_benefDateDeces),
+          ),
+        ]
+
+        // ============================
+        // AUTRES MESSES → BÉNÉFICIAIRE
+        // ============================
+        else if (_benefNomCtrl.text.isNotEmpty) ...[
+          _summaryRow(
+            "Bénéficiaire",
+            "${_benefNomCtrl.text} ${_benefPrenomCtrl.text}".trim(),
+          ),
+        ],
+      ],
+    );
+  }
 
   Widget _summaryRow(String l, String v) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 4),

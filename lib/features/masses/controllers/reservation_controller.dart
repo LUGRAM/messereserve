@@ -17,15 +17,16 @@ class ReservationController extends GetxController {
       status.value = ReservationStatus.loading;
       errorMessage.value = '';
 
-      final response = await _service.createReservation(request)
+      final response = await _service
+          .createReservation(request)
           .timeout(const Duration(seconds: 15));
 
-      if (response['success'] == true || response['reference'] != null) {
+      // Laravel retourne directement la commande
+      if (response != null && response['reference'] != null) {
         reservationResponse.value = response;
         status.value = ReservationStatus.success;
       } else {
-        errorMessage.value =
-            response['message'] ?? "Échec de l'envoi";
+        errorMessage.value = "Échec de l'envoi de la commande";
         status.value = ReservationStatus.failure;
       }
     } catch (e) {
@@ -34,6 +35,7 @@ class ReservationController extends GetxController {
       status.value = ReservationStatus.failure;
     }
   }
+
 
   void resetStatus() {
     status.value = ReservationStatus.idle;

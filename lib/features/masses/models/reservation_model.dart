@@ -34,4 +34,23 @@ class ReservationModel {
       operator: json['operator'],
     );
   }
+
+  factory ReservationModel.fromApi(Map<String, dynamic> json) {
+    final pretre = json['pretre'];
+    final paiement = json['paiement'];
+    final messe = json['messe'];
+
+    return ReservationModel(
+      reference: json['reference'],
+      massTitle: messe?['title'] ?? '',
+      date: json['date_messe'],
+      time: json['heure_messe'],
+      status: json['statut'],
+      pastorName: pretre != null
+          ? '${pretre['nom']} ${pretre['prenom']}'
+          : null,
+      amount: int.parse(messe?['montant']?.toString() ?? '0'),
+      operator: paiement?['operateur'] ?? '',
+    );
+  }
 }

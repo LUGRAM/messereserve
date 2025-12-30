@@ -14,26 +14,29 @@ class AuthController extends GetxController {
   Future<bool> register(String name, String phone, String password) async {
     isLoading.value = true;
 
-    try {
-      final decoded = await _service.register(
-        name: name,
-        phone: phone,
-        password: password,
-      );
+    // try {
+    //
+    // } catch (e) {
+    //   return false;
+    // } finally {
+    //   isLoading.value = false;
+    // }
+    final decoded = await _service.register(
+      name: name,
+      phone: phone,
+      password: password,
+    );
 
-      final token = decoded?['access_token'];
+    print(decoded);
 
-      if (token != null) {
-        _storage.write('auth_token', token);
-        return true;
-      }
+    final token = decoded?['access_token'];
 
-      return false;
-    } catch (e) {
-      return false;
-    } finally {
-      isLoading.value = false;
+    if (token != null) {
+      _storage.write('auth_token', token);
+      return true;
     }
+
+    return false;
   }
 
   // ========= LOGIN =========

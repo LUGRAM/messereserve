@@ -19,7 +19,7 @@ class ReservationService {
     };
 
     final response = await ApiClient.post(
-      "/reservations",
+      "/commande-messe",
       request.toJson(),
     );
 

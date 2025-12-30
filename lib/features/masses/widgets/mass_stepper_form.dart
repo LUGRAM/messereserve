@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/reservation_controller.dart';
 import '../../parish/controllers/paroisse_controller.dart';
@@ -15,12 +16,14 @@ import '../widgets/pastor_selector.dart';
 class MassStepperForm extends StatefulWidget {
   final Color accentColor;
   final String massTitle;
+  final String massAmount;
   final bool requiresBeneficiary;
 
   const MassStepperForm({
     super.key,
     required this.accentColor,
     required this.massTitle,
+    required this.massAmount,
     required this.requiresBeneficiary,
   });
 
@@ -206,25 +209,28 @@ class _MassStepperFormState extends State<MassStepperForm> {
     final req = ReservationRequest(
       massServiceId: 1,
       scheduledDate:
-      "${_dateTime!.year}-${_dateTime!.month}-${_dateTime!.day}",
+      "${_dateTime!.year}-${_dateTime!.month.toString().padLeft(2, '0')}-${_dateTime!.day.toString().padLeft(2, '0')}",
       scheduledTime:
       "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
-      paroisseId: _selectedParoisse!.id,
+
+      paroisseId: _selectedParoisse!.id, // ignoré côté backend pour l’instant
       pastorId: _selectedPastor?.id,
+
       requesterNom: _nomCtrl.text.trim(),
       requesterPrenom: _prenomCtrl.text.trim(),
       requesterNationalite: _nationaliteCtrl.text.trim(),
       requesterTelephone: _telephoneCtrl.text.trim(),
+
       beneficiaryNom:
       widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null,
       beneficiaryPrenom:
       widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null,
-      beneficiaryDateDeces: widget.requiresBeneficiary
-          ? "${_benefDateDeces!.year}-${_benefDateDeces!.month}-${_benefDateDeces!.day}"
+      beneficiaryDateDeces: widget.requiresBeneficiary && _benefDateDeces != null
+          ? "${_benefDateDeces!.year}-${_benefDateDeces!.month.toString().padLeft(2, '0')}-${_benefDateDeces!.day.toString().padLeft(2, '0')}"
           : null,
     );
 
-    _reservationCtrl.submitReservation(req);
+    await _reservationCtrl.submitReservation(req);
     Get.to(() => ReservationLoadingPage());
   }
 
@@ -385,9 +391,11 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
   Widget _buildStep3() => Column(children: [
     _summaryRow("Type", widget.massTitle),
+    _summaryRow("Montant", widget.massAmount),
     _summaryRow("Paroisse", _selectedParoisse?.nom ?? "—"),
-    _summaryRow("Date", _dateTime.toString()),
+    _summaryRow("Date", _convertDate(_dateTime.toString())),
     _summaryRow("Demandeur", "${_nomCtrl.text} ${_prenomCtrl.text}"),
+    _summaryRow("Bénéficiaire", "${_benefNomCtrl.text} ${_benefPrenomCtrl.text}"),
   ]);
 
   Widget _summaryRow(String l, String v) => Padding(
@@ -435,5 +443,13 @@ class _MassStepperFormState extends State<MassStepperForm> {
         ),
       ),
     ]);
+  }
+
+  String _convertDate(String date){
+    DateTime dateTime = DateTime.parse(date);
+
+    String formattedDate = DateFormat("dd-MM-yyyy HH:mm:ss").format(dateTime);
+
+    return formattedDate;
   }
 }

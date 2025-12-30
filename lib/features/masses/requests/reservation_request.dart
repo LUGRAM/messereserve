@@ -38,27 +38,22 @@ class ReservationRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      "mass_service_id": massServiceId,
-      "scheduled_date": scheduledDate,
-      "scheduled_time": scheduledTime,
+      // ===== Messe =====
+      "messe_id": massServiceId,
+      "pretre_id": pastorId,
+      "date_messe": scheduledDate,
+      "heure_messe": scheduledTime,
 
-      "paroisse_id": paroisseId,
-      "pastor_id": pastorId,
+      // ===== Demandeur =====
+      "nom": requesterNom,
+      "prenom": requesterPrenom,
+      "nationalite": requesterNationalite,
+      "telephone": requesterTelephone,
 
-      "requester": {
-        "nom": requesterNom,
-        "prenom": requesterPrenom,
-        "nationalite": requesterNationalite,
-        "telephone": requesterTelephone,
-      },
-
-      "beneficiary": beneficiaryNom != null
-          ? {
-        "nom": beneficiaryNom,
-        "prenom": beneficiaryPrenom,
-        "date_deces": beneficiaryDateDeces,
-      }
-          : null,
+      // ===== Défunt (optionnel) =====
+      "defunt_nom": beneficiaryNom,
+      "defunt_prenom": beneficiaryPrenom,
+      "defunt_date_deces": beneficiaryDateDeces,
     };
   }
 }

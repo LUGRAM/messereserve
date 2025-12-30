@@ -45,6 +45,8 @@ class _RegisterPageState extends State<RegisterPage> {
       _passCtrl.text,
     );
 
+    print(success);
+
     if (success) {
       Get.offAllNamed(Routes.home);
     } else {

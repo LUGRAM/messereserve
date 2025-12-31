@@ -1,3 +1,9 @@
+//\lib\features\masses\services\reservation_api.dart
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:messeconnect/core/network/api_client.dart';
+
 import '../models/reservation_model.dart';
 import '../requests/reservation_request.dart';
 
@@ -14,56 +20,27 @@ class ReservationApi {
     };
   }
 
-  static Future<List<ReservationModel>> fetchReservations() async {
-    await Future.delayed(const Duration(seconds: 2));
+  static Future<List<ReservationModel>> fetchReservations(String token) async {
+    final response = await http.get(
+      Uri.parse('${ApiClient.baseUrl}/mes-commandes-messes'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-    final mockData = [
-      {
-        "reference": "MC-20250228-A1B2C3",
-        "mass_title": "Messe de Requiem",
-        "date": "27/02/2025",
-        "time": "10:00",
-        "status": "pending_validation",
-        "pastor_name": "Père Alain Ndzeng",
-        "paroisse_name": "Paroisse Sainte-Marie",
-        "amount": 8000,
-        "operator": "airtel"
-      },
-      {
-        "reference": "MC-20250227-X9Z7T3",
-        "mass_title": "Messe d’Action de Grâce",
-        "date": "28/02/2025",
-        "time": "14:00",
-        "status": "paid",
-        "pastor_name": null,
-        "paroisse_name": "Paroisse Saint-Michel",
-        "amount": 8000,
-        "operator": "moov"
-      },
-      {
-        "reference": "MC-20250226-Z3Y2W1",
-        "mass_title": "Messe pour la santé",
-        "date": "01/03/2025",
-        "time": "08:30",
-        "status": "pending_payment",
-        "pastor_name": "Père Jean Moukila",
-        "paroisse_name": "Paroisse Saint-Luc",
-        "amount": 8000,
-        "operator": "airtel"
-      },
-      {
-        "reference": "MC-20250225-K7L9M8",
-        "mass_title": "Messe nuptiale",
-        "date": "05/03/2025",
-        "time": "16:00",
-        "status": "rejected",
-        "pastor_name": "Père Gervais Nkouka",
-        "paroisse_name": "Paroisse Saint-Joseph",
-        "amount": 8000,
-        "operator": "moov"
-      }
-    ];
+    final json = jsonDecode(response.body);
 
-    return mockData.map((e) => ReservationModel.fromJson(e)).toList();
+    if (response.statusCode != 200 || json['status'] != 1) {
+      throw Exception(json['message'] ?? 'Erreur de chargement');
+    }
+
+    final List list = json['data'];
+
+    print(list);
+
+    return list
+        .map((e) => ReservationModel.fromApi(e))
+        .toList();
   }
 }

@@ -15,6 +15,7 @@ class MassDetailBasePage extends StatelessWidget {
   final Color accentColor;
   final String lottieAsset;
   final String massTitle;
+  final String massAmount;
   final bool requiresBeneficiary;
 
   MassDetailBasePage({
@@ -26,6 +27,7 @@ class MassDetailBasePage extends StatelessWidget {
     required this.accentColor,
     required this.lottieAsset,
     required this.massTitle,
+    required this.massAmount,
     required this.requiresBeneficiary,
   });
 
@@ -38,6 +40,7 @@ class MassDetailBasePage extends StatelessWidget {
       accentColor: mass.accentColor,
       lottieAsset: mass.lottieAsset,
       massTitle: mass.title,
+      massAmount: mass.amount,
       requiresBeneficiary: mass.requiresBeneficiary,
     );
   }
@@ -149,6 +152,7 @@ class MassDetailBasePage extends StatelessWidget {
                                     id: massId,
                                     accentColor: accentColor,
                                     massTitle: massTitle,
+                                    massAmount: massAmount,
                                     requiresBeneficiary:
                                     requiresBeneficiary,
                                                                       ),

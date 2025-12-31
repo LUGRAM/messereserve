@@ -16,6 +16,7 @@ class MassStepperForm extends StatefulWidget {
   final String id;
   final Color accentColor;
   final String massTitle;
+  final String massAmount;
   final bool requiresBeneficiary;
 
   const MassStepperForm({
@@ -23,6 +24,7 @@ class MassStepperForm extends StatefulWidget {
     required this.id,
     required this.accentColor,
     required this.massTitle,
+    required this.massAmount,
     required this.requiresBeneficiary,
   });
 
@@ -111,7 +113,6 @@ class _MassStepperFormState extends State<MassStepperForm> {
   );
 
 
-
   // ===========================================================================
   // VALIDATIONS
   // ===========================================================================
@@ -134,7 +135,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
     if (!widget.requiresBeneficiary) return true;
 
     if (_benefNomCtrl.text.trim().isEmpty) {
-      Get.snackbar("Bénéficiaire requis","Nom du défunt obligatoire");
+      Get.snackbar("Bénéficiaire requis", "Nom du défunt obligatoire");
       return false;
     }
 
@@ -222,9 +223,12 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
     final req = ReservationRequest(
       massServiceId: 1,
-      scheduledDate: "${_dateTime!.year}-${_dateTime!.month}-${_dateTime!.day}",
-      scheduledTime: "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
-      paroisseId: _selectedParoisse!.id,
+      scheduledDate:
+      "${_dateTime!.year}-${_dateTime!.month.toString().padLeft(2, '0')}-${_dateTime!.day.toString().padLeft(2, '0')}",
+      scheduledTime:
+      "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
+
+      paroisseId: _selectedParoisse!.id, // ignoré côté backend pour l’instant
       pastorId: _selectedPastor?.id,
       requesterNom: _nomCtrl.text.trim(),
       requesterPrenom: _prenomCtrl.text.trim(),
@@ -236,7 +240,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       beneficiaryDateDeces: formattedDateDeces,
     );
 
-    // Naviguer vers la page de loading
+    await _reservationCtrl.submitReservation(req);
     Get.to(() => ReservationLoadingPage());
 
     _reservationCtrl.resetStatus();

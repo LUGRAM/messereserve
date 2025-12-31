@@ -1,6 +1,7 @@
 // lib/features/masses/pages/reservations/reservations_list_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
@@ -20,6 +21,10 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   List<ReservationModel> _reservations = [];
   bool _loading = true;
 
+  final GetStorage _box = GetStorage();
+
+  String? get token => _box.read("token");
+
   @override
   void initState() {
     super.initState();
@@ -28,11 +33,16 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   }
 
   Future<void> _loadReservations() async {
-    final data = await ReservationApi.fetchReservations();
+    final data = await ReservationApi.fetchReservations(token!);
+    print("========== Liste des reservation recuperee ================");
+    print(data);
     setState(() {
       _reservations = data;
       _loading = false;
     });
+
+    print("======Reservations========");
+    print(_reservations);
   }
 
   List<ReservationModel> _filterMultiple(List<String> statuses) {
@@ -44,7 +54,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   // ----------------------------------------------------------
   Widget _paymentButton(ReservationModel r) {
     switch (r.status) {
-      case "pending_validation":
+      case "en_attente_validation":
         return _paymentState(
           label: "Régler la commande",
           color: Colors.blueGrey.shade700,
@@ -52,7 +62,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
           enabled: false,
         );
 
-      case "pending_payment":
+      case "en_attente_paiement":
         return _paymentState(
           label: "Régler la commande",
           color: Colors.blue,
@@ -64,10 +74,10 @@ class _ReservationsListPageState extends State<ReservationsListPage>
           ),
         );
 
-      case "paid":
+      case "payee":
         return _statusBadge("Payée", Colors.green, Icons.check_circle);
 
-      case "rejected":
+      case "annulee":
         return _statusBadge("Annulée", Colors.grey.shade700, Icons.cancel);
 
       default:
@@ -240,10 +250,10 @@ class _ReservationsListPageState extends State<ReservationsListPage>
           children: [
             _buildTab(
               _filterMultiple(
-                  ["pending_validation", "pending_payment"]),
+                  ["en_attente_validation", "en_attente_paiement"]),
             ),
-            _buildTab(_filterMultiple(["paid"])),
-            _buildTab(_filterMultiple(["rejected"])),
+            _buildTab(_filterMultiple(["payee"])),
+            _buildTab(_filterMultiple(["refusee"])),
           ],
         ),
       ),

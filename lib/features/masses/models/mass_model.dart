@@ -5,6 +5,7 @@ class MassModel {
 
   // Affichage
   final String title;
+  final String amount;
   final String subtitle;
   final String imageAsset;
   final String heroTag;
@@ -19,6 +20,7 @@ class MassModel {
   const MassModel({
     required this.id,
     required this.title,
+    required this.amount,
     required this.subtitle,
     required this.imageAsset,
     required this.heroTag,

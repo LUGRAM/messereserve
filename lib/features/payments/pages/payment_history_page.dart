@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
@@ -13,6 +14,9 @@ class PaymentHistoryPage extends StatefulWidget {
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   List<ReservationModel> _paidReservations = [];
   bool _loading = true;
+  final GetStorage _box = GetStorage();
+
+  String? get token => _box.read("token");
 
   @override
   void initState() {
@@ -21,7 +25,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Future<void> _loadPayments() async {
-    final all = await ReservationApi.fetchReservations();
+    final all = await ReservationApi.fetchReservations(token!);
     setState(() {
       _paidReservations = all.where((r) => r.status == "paid").toList();
       _loading = false;

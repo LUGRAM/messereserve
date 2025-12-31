@@ -68,10 +68,6 @@ class _ReservationsListPageState extends State<ReservationsListPage>
           color: Colors.blue,
           icon: Icons.lock_open_rounded,
           enabled: true,
-          onTap: () => Get.toNamed(
-            Routes.payment,
-            arguments: r,
-          ),
         );
 
       case "payee":
@@ -139,71 +135,105 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   // ----------------------------------------------------------
   Widget _reservationCard(ReservationModel r) {
     return InkWell(
+      // Utilisation de borderRadius sur le InkWell pour que l'effet de ripple soit propre
+      borderRadius: BorderRadius.circular(20),
       onTap: () => Get.toNamed(
         Routes.reservationDetail,
         arguments: r,
       ),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(20),
+          // Bordure subtile pour un aspect premium
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8,
-              offset: Offset(0, 3),
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-        Hero(
-        tag: "church_icon_${r.reference}", // Tag unique indispensable !
-          child: CircleAvatar(
-            radius: 26,
-            backgroundColor: Colors.orange.withValues(alpha: 0.15),
-            child: const Icon(Icons.church, color: Colors.orange),
-          ),
-        ),
-            /*CircleAvatar(
-              radius: 26,
-              backgroundColor: Colors.orange.withValues(alpha: 0.15),
-              child: const Icon(Icons.church, color: Colors.orange),
-            ),*/
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    r.massTitle,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "${r.date} à ${r.time}",
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
+            children: [
+              // Petit accent de couleur sur le côté
+              Positioned(
+                left: 0, top: 0, bottom: 0,
+                child: Container(width: 5, color: Colors.orangeAccent),
               ),
-            ),
-            _paymentButton(r),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    // --- HERO UNIQUE ---
+                    Hero(
+                      tag: "res_icon_${r.reference}",
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Icon(
+                          Icons.church, // Changement pour un look plus "spirituel/éclatant"
+                          color: Colors.orange,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+
+                    // --- INFOS ---
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            r.massTitle,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2D3436),
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey),
+                              const SizedBox(width: 5),
+                              Text(
+                                r.date,
+                                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(Icons.access_time, size: 14, color: Colors.grey),
+                              const SizedBox(width: 5),
+                              Text(
+                                r.time,
+                                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // --- ACTION ---
+                    _paymentButton(r),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
   // ----------------------------------------------------------
   // BUILD
   // ----------------------------------------------------------

@@ -8,6 +8,7 @@ import '../../../app/router/routes.dart';
 import '../models/mass_model.dart';
 
 class MassDetailBasePage extends StatelessWidget {
+  final int apiId;
   final String heroTag;
   final String imageAsset;
   final String title;
@@ -20,6 +21,7 @@ class MassDetailBasePage extends StatelessWidget {
 
   MassDetailBasePage({
     super.key,
+    required this.apiId,
     required this.heroTag,
     required this.imageAsset,
     required this.title,
@@ -33,6 +35,7 @@ class MassDetailBasePage extends StatelessWidget {
 
   factory MassDetailBasePage.forMass(MassModel mass) {
     return MassDetailBasePage(
+      apiId: mass.apiId,
       heroTag: mass.heroTag,
       imageAsset: mass.imageAsset,
       title: mass.title,
@@ -149,6 +152,7 @@ class MassDetailBasePage extends StatelessWidget {
                                   const SizedBox(height: 6),
 
                                   MassStepperForm(
+                                    apiId: apiId,
                                     id: massId,
                                     accentColor: accentColor,
                                     massTitle: massTitle,

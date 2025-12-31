@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class MassModel {
   final String id;
+  final int apiId;
 
   // Affichage
   final String title;
@@ -19,6 +20,7 @@ class MassModel {
 
   const MassModel({
     required this.id,
+    required this.apiId,
     required this.title,
     required this.amount,
     required this.subtitle,

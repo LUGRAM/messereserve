@@ -16,7 +16,7 @@ class ReservationDetailPage extends StatelessWidget {
   // ----------------------------------------------------------
   // LOGIQUE COULEURS & LABELS
   // ----------------------------------------------------------
-  Color _statusColor(String status) {
+/*  Color _statusColor(String status) {
     switch (status) {
       case "pending_payment":
         return Colors.orange;
@@ -41,7 +41,37 @@ class ReservationDetailPage extends StatelessWidget {
         return "En attente de validation";
     }
   }
+*/
 
+  Color _statusColor(String status) {
+    switch (status) {
+      case "en_attente_paiement":
+        return Colors.blue; // Bleu pour l'action possible
+      case "payee":
+        return Colors.green;
+      case "refusee":
+      case "annulee":
+        return Colors.redAccent;
+      case "en_attente_validation":
+      default:
+        return Colors.blueGrey;
+    }
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case "en_attente_paiement":
+        return "En attente de paiement";
+      case "payee":
+        return "Payée";
+      case "refusee":
+      case "annulee":
+        return "Annulée";
+      case "en_attente_validation":
+      default:
+        return "En attente de validation";
+    }
+  }
   // ----------------------------------------------------------
   // WIDGETS DÉCOUPÉS (Clean Code)
   // ----------------------------------------------------------
@@ -140,23 +170,20 @@ class ReservationDetailPage extends StatelessWidget {
   }
 
   Widget _buildActionButton(ReservationModel r) {
-    if (r.status == "pending_payment") {
+    // CAS 1 : Débloqué pour le paiement
+    if (r.status == "en_attente_paiement") {
       return SizedBox(
         width: double.infinity,
         child: ElevatedButton.icon(
           icon: const Icon(Icons.lock_open_rounded, color: Colors.white),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 4,
           ),
-          onPressed: () {
-            Get.toNamed(Routes.payment, arguments: r);
-          },
+          onPressed: () => Get.toNamed(Routes.payment, arguments: r),
           label: const Text(
             "Régler la commande",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -165,27 +192,27 @@ class ReservationDetailPage extends StatelessWidget {
       );
     }
 
-    // Boutons passifs (Info seulement)
-    Color bgColor;
+    // CAS 2 : Boutons d'état (Passifs)
     IconData icon;
     String text;
-    Color textColor = Colors.white;
+    Color bgColor;
 
     switch (r.status) {
-      case "paid":
+      case "payee":
         bgColor = Colors.green;
         icon = Icons.check_circle;
         text = "Commande payée";
         break;
-      case "rejected":
-        bgColor = Colors.grey.shade300;
-        textColor = Colors.black54;
+      case "refusee":
+      case "annulee":
+        bgColor = Colors.redAccent.withOpacity(0.8);
         icon = Icons.cancel;
         text = "Commande annulée";
         break;
-      default: // pending_validation
-        bgColor = Colors.blueGrey;
-        icon = Icons.hourglass_empty;
+      case "en_attente_validation":
+      default:
+        bgColor = Colors.blueGrey.shade400; // Aspect grisé/verrouillé
+        icon = Icons.lock;
         text = "En attente de validation";
         break;
     }
@@ -200,21 +227,20 @@ class ReservationDetailPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: textColor),
+          Icon(icon, color: Colors.white),
           const SizedBox(width: 8),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: textColor,
+              color: Colors.white,
             ),
           ),
         ],
       ),
     );
   }
-
   // ----------------------------------------------------------
   // MAIN BUILD
   // ----------------------------------------------------------

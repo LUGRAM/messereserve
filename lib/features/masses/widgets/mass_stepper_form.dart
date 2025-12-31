@@ -13,6 +13,7 @@ import '../pages/reservations/reservation_loading_page.dart';
 import '../widgets/pastor_selector.dart';
 
 class MassStepperForm extends StatefulWidget {
+  final int apiId;
   final String id;
   final Color accentColor;
   final String massTitle;
@@ -21,6 +22,7 @@ class MassStepperForm extends StatefulWidget {
 
   const MassStepperForm({
     super.key,
+    required this.apiId,
     required this.id,
     required this.accentColor,
     required this.massTitle,
@@ -222,7 +224,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
     }
 
     final req = ReservationRequest(
-      massServiceId: 1,
+      massServiceId: widget.apiId,
       scheduledDate:
       "${_dateTime!.year}-${_dateTime!.month.toString().padLeft(2, '0')}-${_dateTime!.day.toString().padLeft(2, '0')}",
       scheduledTime:
@@ -240,12 +242,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
       beneficiaryDateDeces: formattedDateDeces,
     );
 
-    await _reservationCtrl.submitReservation(req);
     Get.to(() => ReservationLoadingPage());
-
-    _reservationCtrl.resetStatus();
-    _reservationCtrl.submitReservation(req);
+    await _reservationCtrl.submitReservation(req, widget.massTitle);
   }
+
   // ===========================================================================
   // BUILD
   // ===========================================================================

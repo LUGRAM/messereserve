@@ -131,7 +131,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(6),
                       child: Image.asset(
-                        'assets/icons/${(r.operator ?? "").toLowerCase()}.jpg',
+                        'assets/icons/airtel.jpg',
                         height: 24,
                         width: 24,
                         fit: BoxFit.contain,
@@ -141,7 +141,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      r.operator?.toUpperCase() ?? "-",
+                      'moov',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,

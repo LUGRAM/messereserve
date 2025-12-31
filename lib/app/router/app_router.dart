@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 // Transitions
 import 'package:messeconnect/app/transition/transitions.dart';
+import '../transition/blur_transition.dart';
 import '../transition/soft_slide_transition.dart';
 
 
@@ -108,6 +109,8 @@ class AppRouter {
         final reservation = Get.arguments as ReservationModel;
         return ReservationDetailPage(reservation: reservation);
       },
+      customTransition: BlurTransition(),
+      transitionDuration: const Duration(milliseconds: 200),
     ),
     GetPage(
       name: Routes.parishes,

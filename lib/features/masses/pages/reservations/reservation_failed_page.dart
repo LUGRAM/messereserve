@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+
+import '../../../../app/router/routes.dart';
 import '../../controllers/reservation_controller.dart';
 
 class ReservationFailedPage extends StatelessWidget {
@@ -9,113 +12,109 @@ class ReservationFailedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Utilisation des couleurs du thème ou des couleurs ecclésiastiques (Bordeaux/Or)
-    const primaryColor = Color(0xFF8B0000); // Un rouge profond/sacré
-
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.grey.shade900,
-              Colors.black87,
+              Color(0xFF5A1F2A), // bordeaux liturgique doux
+              Color(0xFF2C1B1F), // brun profond apaisant
             ],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Iconographie plus symbolique (un clocher ou une main en prière barrée)
-              const Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(
-                    Icons.church_outlined,
-                    size: 100,
-                    color: Colors.white10,
-                  ),
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    size: 50,
-                    color: Colors.orangeAccent,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-
-              const Text(
-                "Action interrompue",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w300,
-                  letterSpacing: 1.2,
-                  fontFamily: 'Serif', // Pour un aspect plus solennel
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 26),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animation échec (signal discret)
+                Lottie.asset(
+                  'assets/lottie/failed.json',
+                  height: 130,
+                  repeat: false,
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 28),
 
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white12),
-                ),
-                child: Text(
-                  message,
+                const Text(
+                  "Action interrompue",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 15,
-                    height: 1.5,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.6,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 14),
 
-              // Bouton stylisé "Pro"
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.12),
                     ),
-                    elevation: 0,
                   ),
-                  onPressed: () {
-                    Get.find<ReservationController>().resetStatus();
-                    Get.back();
-                  },
+                  child: Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 15,
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 42),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6A1E2E),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.find<ReservationController>().resetStatus();
+                      Get.back();
+                    },
+                    child: const Text(
+                      "RETOUR AU FORMULAIRE",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.0,
+                        fontSize: 14.5,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                TextButton(
+                  onPressed: () => Get.offAllNamed(Routes.home),
                   child: const Text(
-                    "RETOUR AU FORMULAIRE",
+                    "Retour à l'accueil",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
+                      color: Colors.white54,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-              ),
-
-              TextButton(
-                onPressed: () => Get.offAllNamed('/home'),
-                child: const Text(
-                  "Retour à l'accueil",
-                  style: TextStyle(color: Colors.white38),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

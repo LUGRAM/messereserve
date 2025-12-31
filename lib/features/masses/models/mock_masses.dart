@@ -3,6 +3,7 @@ import 'mass_model.dart';
 
 final List<MassModel> mockMasses = [
   MassModel(
+    apiId: 1,
     id: "requiem",
     title: "Messe de Requiem",
     amount: "2000",
@@ -15,6 +16,7 @@ final List<MassModel> mockMasses = [
   ),
 
   MassModel(
+    apiId: 2,
     id: "action-grace",
     title: "Messe d’Action de Grâce",
     amount: "2000",
@@ -27,6 +29,7 @@ final List<MassModel> mockMasses = [
   ),
 
   MassModel(
+    apiId: 3,
     id: "guerison",
     title: "Messe pour la Santé",
     amount: "2000",
@@ -39,6 +42,7 @@ final List<MassModel> mockMasses = [
   ),
 
   MassModel(
+    apiId: 4,
     id: "nuptiale",
     title: "Messe Nuptiale",
     amount: "2000",

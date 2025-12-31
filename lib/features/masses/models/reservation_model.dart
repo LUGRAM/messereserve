@@ -7,7 +7,6 @@ class ReservationModel {
   final String? pastorName;
   final String? paroisseName;
   final int? amount;
-  final String? operator;
 
   ReservationModel({
     required this.reference,
@@ -18,9 +17,8 @@ class ReservationModel {
     this.pastorName,
     this.paroisseName,
     this.amount,
-    this.operator
   });
-
+/*
   factory ReservationModel.fromJson(Map<String, dynamic> json) {
     return ReservationModel(
       reference: json["reference"] ?? "",
@@ -33,24 +31,31 @@ class ReservationModel {
       amount: json['amount'],
       operator: json['operator'],
     );
-  }
+  }*/
 
   factory ReservationModel.fromApi(Map<String, dynamic> json) {
     final pretre = json['pretre'];
     final paiement = json['paiement'];
     final messe = json['messe'];
+    final paroisse = json['paroisse']; // On récupère l'objet paroisse
 
     return ReservationModel(
-      reference: json['reference'],
-      massTitle: messe?['title'] ?? '',
-      date: json['date_messe'],
-      time: json['heure_messe'],
-      status: json['statut'],
+      reference: json['reference'] ?? 'N/A',
+      massTitle: messe?['title'] ?? messe?['nom'] ?? 'Messe',
+      date: json['date_messe'] ?? '',
+      time: json['heure_messe'] ?? '',
+      status: json['statut'] ?? 'en_attente_validation',
+
+      // Logique demandée pour le Pasteur
       pastorName: pretre != null
-          ? '${pretre['nom']} ${pretre['prenom']}'
-          : null,
-      amount: int.parse(messe?['montant']?.toString() ?? '0'),
-      operator: paiement?['operateur'] ?? '',
+          ? "${pretre['nom'] ?? ''} ${pretre['prenom'] ?? ''}".trim()
+          : "Non précisé",
+
+      // Même méthode appliquée pour la Paroisse
+      paroisseName: paroisse != null
+          ? "${paroisse['nom'] ?? ''}".trim()
+          : "Erreur: Paroisse manquante",
+
+      amount: int.tryParse(messe?['montant']?.toString() ?? '0') ?? 0,
     );
-  }
-}
+  }}

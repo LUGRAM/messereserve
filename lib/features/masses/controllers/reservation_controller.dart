@@ -11,7 +11,7 @@ class ReservationController extends GetxController {
   final errorMessage = ''.obs;
   final reservationResponse = Rxn<Map<String, dynamic>>();
 
-  Future<void> submitReservation(ReservationRequest request) async {
+  Future<void> submitReservation(ReservationRequest request, String massTitle) async {
     try {
       status.value = ReservationStatus.loading;
       errorMessage.value = '';
@@ -22,7 +22,12 @@ class ReservationController extends GetxController {
 
       // Laravel retourne directement la commande
       if (response != null && response['reference'] != null) {
-        reservationResponse.value = response;
+        reservationResponse.value = {
+          ...response,
+          'display_title': massTitle,
+          'display_date': request.scheduledDate,
+          'display_time': request.scheduledTime,
+        };
         status.value = ReservationStatus.success;
       } else {
         errorMessage.value = "Échec de l'envoi de la commande";

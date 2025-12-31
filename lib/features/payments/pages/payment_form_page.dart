@@ -24,22 +24,29 @@ class _PaymentFormPageState extends State<PaymentFormPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.gradientTop,
-              AppColors.gradientBottom,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.gradientTop,
+                  AppColors.gradientBottom,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: Get.back,
@@ -189,11 +196,13 @@ class _PaymentFormPageState extends State<PaymentFormPage>
                   ),
                 ],
               ),
-            ],
+            ], ///// voici
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        );
+      },
+    )));
   }
 
   // ----------------------------------------------------------
@@ -233,6 +242,8 @@ class _PaymentFormPageState extends State<PaymentFormPage>
               'assets/icons/$operatorAsset.jpg',
               height: 30,
               fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) =>
+              const Icon(Icons.image_not_supported, size: 30),
             ),
           ),
         ),

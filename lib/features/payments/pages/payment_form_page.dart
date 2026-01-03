@@ -1,4 +1,6 @@
 // lib/features/payments/pages/payment_form_page.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -6,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/widgets/primary_button_loading.dart';
 import '../../../app/router/routes.dart';
+import '../services/payment_api.dart';
 
 class PaymentFormPage extends StatefulWidget {
   const PaymentFormPage({super.key});
@@ -20,6 +23,16 @@ class _PaymentFormPageState extends State<PaymentFormPage>
   int _selectedOperator = 0; // 0: Airtel, 1: Moov
   bool _saveForLater = false;
   bool _isLoading = false;
+  Timer? _paymentTimer;
+  static const int _maxAttempts = 36;
+
+  late final String commandeId;
+
+  @override
+  void initState() {
+    super.initState();
+    commandeId = Get.parameters['id']!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +64,14 @@ class _PaymentFormPageState extends State<PaymentFormPage>
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: Get.back,
               ),
-              const Text(
-                "Réglez votre messe avec foi et sécurité",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              const Center(
+                child: Text(
+                  "Réglez votre messe en toute sécurité",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -110,8 +125,14 @@ class _PaymentFormPageState extends State<PaymentFormPage>
                       TextField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
+                        style: TextStyle(
+                          color: Colors.black
+                        ),
                         decoration: InputDecoration(
-                          hintText: "+241 07xx xxx",
+                          hintText: "07xxxxx",
+                          hintStyle: TextStyle(
+                            color: Colors.black54
+                          ),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -121,43 +142,6 @@ class _PaymentFormPageState extends State<PaymentFormPage>
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      _buildLabel("Nom du demandeur"),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          "Emma NDONG",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _saveForLater,
-                            onChanged: (v) =>
-                                setState(() => _saveForLater = v ?? false),
-                            activeColor: AppColors.navActive,
-                          ),
-                          const Expanded(
-                            child: Text(
-                              "Mémoriser ce moyen pour mes prochaines messes",
-                              style: TextStyle(color: Colors.black87),
-                            ),
-                          )
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -263,12 +247,102 @@ class _PaymentFormPageState extends State<PaymentFormPage>
       return;
     }
 
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
+    final String paymentMethod =
+    _selectedOperator == 0 ? 'AM' : 'MC';
 
-    _showSuccessDialog();
+    setState(() => _isLoading = true);
+    final payment = PaymentApi();
+
+    // INITIER LE PAIEMENT
+    final response = await payment.pay(
+      commandeId: commandeId,
+      method: paymentMethod,
+      phone: _phoneController.text.trim(),
+    );
+
+    print("=============Data==============");
+    print(response);
+    // if (response['status'] == null &&
+    //     response['status'] is String &&
+    //     response['status'].toString().trim().isEmpty) {
+    //   throw response['message'] ?? "Erreur lors de l'initialisation du paiement";
+    // }
+
+    // Vérification de la clé
+    if (!response.containsKey('reference') || response['reference'] == null) {
+      throw Exception("Référence de paiement introuvable");
+    }
+
+    final String reference = response['reference'];
+
+    print("===============Ceci est la reference===============");
+    print(reference);
+
+    // LANCER LA VÉRIFICATION DU STATUT
+    _startPaymentCheck(reference);
   }
+
+  void _startPaymentCheck(String reference) {
+    int attempts = 0;
+
+    _paymentTimer?.cancel();
+    var payment = PaymentApi();
+
+    _paymentTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      attempts++;
+
+      final Map<String, dynamic> result =
+      await payment.check(reference);
+
+      final String? status = result['status']?.toString();
+
+      print("===========Statut dant le start payment==========");
+      print(status);
+
+      if (status == 'PAYED') {
+        timer.cancel();
+        setState(() => _isLoading = false);
+        _showSuccessDialog();
+        return;
+      }
+
+      if (status == 'FAILED') {
+        timer.cancel();
+        setState(() => _isLoading = false);
+        Get.snackbar(
+          "Paiement échoué",
+          "La transaction a été refusée ou annulée",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      // ⏱️ Timeout
+      if (attempts >= _maxAttempts) {
+        timer.cancel();
+        setState(() => _isLoading = false);
+        Get.snackbar(
+          "Paiement en attente",
+          "La confirmation du paiement prend trop de temps. Veuillez réessayer.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+
+      // try {
+      //
+      //
+      // } catch (e) {
+      //   timer.cancel();
+      //   setState(() => _isLoading = false);
+      //   Get.snackbar(
+      //     "Erreur",
+      //     "Impossible de vérifier le statut du paiement",
+      //     snackPosition: SnackPosition.BOTTOM,
+      //   );
+      // }
+    });
+  }
+
 
   void _showSuccessDialog() {
     late final AnimationController controller;
@@ -294,13 +368,14 @@ class _PaymentFormPageState extends State<PaymentFormPage>
               "Paiement confirmé",
               textAlign: TextAlign.center,
               style:
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
             ),
           ],
         ),
         content: const Text(
           "Merci pour votre contribution.\nVous recevrez un SMS de confirmation dans un instant.",
           textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black),
         ),
         actions: [
           ElevatedButton.icon(
@@ -311,8 +386,11 @@ class _PaymentFormPageState extends State<PaymentFormPage>
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.navActive,
             ),
-            icon: const Icon(Icons.home),
-            label: const Text("Retour à l'accueil"),
+            icon: const Padding(padding: EdgeInsets.symmetric(horizontal: 5), child: Icon(Icons.home),),
+            label: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+              child: Text("Retour à l'accueil"),
+            ),
           ),
         ],
       ),

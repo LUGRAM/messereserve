@@ -1,4 +1,5 @@
 class ReservationModel {
+  final String id;
   final String reference;
   final String massTitle;
   final String date;
@@ -6,9 +7,11 @@ class ReservationModel {
   final String status;
   final String? pastorName;
   final String? paroisseName;
+  final String? paymentMethod;
   final int? amount;
 
   ReservationModel({
+    required this.id,
     required this.reference,
     required this.massTitle,
     required this.date,
@@ -16,6 +19,7 @@ class ReservationModel {
     required this.status,
     this.pastorName,
     this.paroisseName,
+    this.paymentMethod,
     this.amount,
   });
 /*
@@ -40,6 +44,7 @@ class ReservationModel {
     final paroisse = json['paroisse']; // On récupère l'objet paroisse
 
     return ReservationModel(
+      id: json['id'].toString(),
       reference: json['reference'] ?? 'N/A',
       massTitle: messe?['title'] ?? messe?['nom'] ?? 'Messe',
       date: json['date_messe'] ?? '',
@@ -55,6 +60,8 @@ class ReservationModel {
       paroisseName: paroisse != null
           ? "${paroisse['nom'] ?? ''}".trim()
           : "Erreur: Paroisse manquante",
+
+      paymentMethod: paiement != null ? "${paiement['payment_method']}".trim() : null,
 
       amount: int.tryParse(messe?['montant']?.toString() ?? '0') ?? 0,
     );

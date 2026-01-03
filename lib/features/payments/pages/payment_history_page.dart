@@ -27,7 +27,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Future<void> _loadPayments() async {
     final all = await ReservationApi.fetchReservations(token!);
     setState(() {
-      _paidReservations = all.where((r) => r.status == "paid").toList();
+      _paidReservations = all.where((r) => r.status == "terminee").toList();
       _loading = false;
     });
   }
@@ -109,10 +109,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             Text("Référence : ${r.reference}",
                 style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("${r.date} - ${r.time}",
+                Text("Date : ${r.date} - ${r.time}",
                     style: const TextStyle(
                         fontWeight: FontWeight.w500, color: Colors.white)),
                 Text(r.paroisseName ?? "Paroisse inconnue",
@@ -131,7 +131,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(6),
                       child: Image.asset(
-                        'assets/icons/airtel.jpg',
+                        (r.paymentMethod != null && r.paymentMethod == 'AM') ? 'assets/icons/airtel.jpg' : 'assets/icons/moov.jpg',
                         height: 24,
                         width: 24,
                         fit: BoxFit.contain,
@@ -141,7 +141,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'moov',
+                      (r.paymentMethod != null && r.paymentMethod == 'AM') ? 'AirtelMoney' : 'MoovMoney',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,

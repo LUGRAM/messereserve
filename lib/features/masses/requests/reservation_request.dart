@@ -39,6 +39,7 @@ class ReservationRequest {
   Map<String, dynamic> toJson() {
     return {
       // ===== Messe =====
+      "paroisse_id": paroisseId,
       "messe_id": massServiceId,
       "pretre_id": pastorId,
       "date_messe": scheduledDate,

@@ -177,13 +177,13 @@ class ReservationDetailPage extends StatelessWidget {
         child: ElevatedButton.icon(
           icon: const Icon(Icons.lock_open_rounded, color: Colors.white),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.yellow,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 4,
           ),
-          onPressed: () => Get.toNamed(Routes.payment, arguments: r),
+          onPressed: () => Get.toNamed(Routes.payment.replaceFirst(':id', r.id.toString())),
           label: const Text(
             "Régler la commande",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -198,12 +198,18 @@ class ReservationDetailPage extends StatelessWidget {
     Color bgColor;
 
     switch (r.status) {
-      case "payee":
+      case "terminee":
         bgColor = Colors.green;
+        icon = Icons.check_circle;
+        text = "Commande terminée";
+        break;
+      case "refusee":
+      case "payee":
+        bgColor = Colors.blue;
         icon = Icons.check_circle;
         text = "Commande payée";
         break;
-      case "refusee":
+      //case "refusee":
       case "annulee":
         bgColor = Colors.redAccent.withOpacity(0.8);
         icon = Icons.cancel;

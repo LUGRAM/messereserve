@@ -86,7 +86,7 @@ class AppRouter {
     ),
     GetPage(
       name: Routes.profile,
-      page: () => MainNavigation(content: const ProfilePage()),
+      page: () => MainNavigation(content: ProfilePage()),
       middlewares: [AuthMiddleware()],
     ),
     GetPage(

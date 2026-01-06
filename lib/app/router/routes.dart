@@ -35,5 +35,5 @@ class Routes {
   // MASS FLOW
   // =====================
   static const massDetail = '/mass/:id';
-  static const payment = '/payment';
+  static const payment = '/payment/:id';
 }

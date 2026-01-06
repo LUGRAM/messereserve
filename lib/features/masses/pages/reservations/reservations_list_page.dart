@@ -28,7 +28,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadReservations();
   }
 
@@ -65,15 +65,18 @@ class _ReservationsListPageState extends State<ReservationsListPage>
       case "en_attente_paiement":
         return _paymentState(
           label: "Régler la commande",
-          color: Colors.blue,
+          color: Colors.yellow,
           icon: Icons.lock_open_rounded,
           enabled: true,
         );
 
       case "payee":
-        return _statusBadge("Payée", Colors.green, Icons.check_circle);
+        return _statusBadge("Payée", Colors.blue, Icons.check_circle);
 
-      case "annulee":
+      case "terminee":
+        return _statusBadge("Terminée", Colors.green, Icons.check_circle);
+
+      case "refusee":
         return _statusBadge("Annulée", Colors.grey.shade700, Icons.cancel);
 
       default:
@@ -219,12 +222,16 @@ class _ReservationsListPageState extends State<ReservationsListPage>
                               ),
                             ],
                           ),
+                          Text(
+                            r.reference,
+                            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 5,),
+                          // --- ACTION ---
+                          _paymentButton(r),
                         ],
                       ),
                     ),
-
-                    // --- ACTION ---
-                    _paymentButton(r),
                   ],
                 ),
               ),
@@ -263,6 +270,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
             tabs: const [
               Tab(text: "Demandes"),
               Tab(text: "Succès"),
+              Tab(text: "Terminées"),
               Tab(text: "Annulées"),
             ],
           ),
@@ -283,6 +291,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
                   ["en_attente_validation", "en_attente_paiement"]),
             ),
             _buildTab(_filterMultiple(["payee"])),
+            _buildTab(_filterMultiple(["terminee"])),
             _buildTab(_filterMultiple(["refusee"])),
           ],
         ),

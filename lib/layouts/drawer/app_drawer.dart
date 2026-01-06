@@ -15,10 +15,37 @@ class AppDrawer extends StatelessWidget {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+
+  void _confirmLogout() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.redAccent.shade100.withValues(alpha: 0.80),
+        title: const Text("Déconnexion"),
+        content: const Text("Voulez-vous vraiment vous déconnecter ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(), // ferme la popup
+            child: const Text("Annuler"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // ferme la popup
+              Get.find<AuthController>().logout();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Padding(
+              padding: EdgeInsets.only(left: 10.0, right: 10.0),
+              child: Text("Déconnecter"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    final AuthController authController = Get.find<AuthController>();
-
     return Drawer(
       backgroundColor: AppColors.surface,
       child: ListView(
@@ -121,7 +148,7 @@ class AppDrawer extends StatelessWidget {
             color: Colors.red,
             onTap: () {
               Get.back();
-              authController.logout(); // nettoie token + redirection
+              _confirmLogout(); // nettoie token + redirection
             },
           ),
 

@@ -1,27 +1,28 @@
 import 'package:get/get.dart';
 
 // Transitions
-import 'package:messeconnect/app/transition/transitions.dart';
 import '../transition/blur_transition.dart';
-import '../transition/soft_slide_transition.dart';
-
+import '../transition/transitions.dart';
 
 // Layouts
 import 'package:messeconnect/layouts/auth_layout.dart';
 import 'package:messeconnect/layouts/mass_layout.dart';
 import 'package:messeconnect/features/navigation/main_navigation.dart';
 
-// Pages Auth
+// Auth
 import 'package:messeconnect/features/splash/splash_page.dart';
 import 'package:messeconnect/features/onboarding/onboarding_page.dart';
 import 'package:messeconnect/features/auth/pages/login_page.dart';
 import 'package:messeconnect/features/auth/pages/register_page.dart';
 
-// Pages principales
+// Main tabs
 import 'package:messeconnect/features/home/pages/home_page.dart';
 import 'package:messeconnect/features/profile/pages/profile_page.dart';
-import 'package:messeconnect/features/support/pages/support_page.dart';
 import 'package:messeconnect/features/payments/pages/payment_history_page.dart';
+import 'package:messeconnect/features/support/pages/support_page.dart';
+
+// Profile
+import 'package:messeconnect/features/profile/pages/edit_profile_sheet.dart';
 
 // Masses & réservations
 import 'package:messeconnect/features/masses/pages/mass_detail_base_page.dart';
@@ -45,15 +46,15 @@ import 'package:messeconnect/features/static/pages/legal_page.dart';
 // Notifications
 import 'package:messeconnect/features/notifications/pages/notifications_page.dart';
 
+// Middlewares
 import '../middlewares/auth_middleware.dart';
 import 'routes.dart';
 
 class AppRouter {
   static final routes = [
 
-
     // =====================================================
-    // AUTH
+    // AUTH FLOW
     // =====================================================
 
     GetPage(
@@ -73,12 +74,10 @@ class AppRouter {
       page: () => AuthLayout(child: const RegisterPage()),
     ),
 
-
     // =====================================================
-    // MAIN NAVIGATION
+    // MAIN NAVIGATION (TABS)
     // =====================================================
 
-    // Routes protégées-
     GetPage(
       name: Routes.home,
       page: () => MainNavigation(content: const HomePage()),
@@ -90,18 +89,35 @@ class AppRouter {
       middlewares: [AuthMiddleware()],
     ),
     GetPage(
-      name: Routes.reservations,
-      page: () => const ReservationsListPage(),
-      middlewares: [AuthMiddleware()],
-    ),
-
-    GetPage(
       name: Routes.payments,
       page: () => MainNavigation(content: const PaymentHistoryPage()),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.support,
       page: () => MainNavigation(content: const SupportPage()),
+      middlewares: [AuthMiddleware()],
+    ),
+
+    // =====================================================
+    // PROFILE (SECONDARY)
+    // =====================================================
+
+    GetPage(
+      name: Routes.editProfile,
+      page: () => const EditProfileSheet(),
+      middlewares: [AuthMiddleware()],
+      transition: Transition.upToDown,
+    ),
+
+    // =====================================================
+    // RESERVATIONS
+    // =====================================================
+
+    GetPage(
+      name: Routes.reservations,
+      page: () => const ReservationsListPage(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.reservationDetail,
@@ -111,7 +127,43 @@ class AppRouter {
       },
       customTransition: BlurTransition(),
       transitionDuration: const Duration(milliseconds: 200),
+      middlewares: [AuthMiddleware()],
     ),
+
+    // =====================================================
+    // MASS FLOW
+    // =====================================================
+
+    GetPage(
+      name: Routes.massDetail,
+      page: () {
+        final id = Get.parameters['id'];
+        final mass = mockMasses.firstWhereOrNull((m) => m.id == id);
+
+        if (mass == null) {
+          return MainNavigation(content: const HomePage());
+        }
+
+        return MassLayout(
+          child: MassDetailBasePage.forMass(mass),
+        );
+      },
+      binding: MassBinding(),
+      middlewares: [AuthMiddleware()],
+      customTransition: MassTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+
+    GetPage(
+      name: Routes.payment,
+      page: () => const PaymentFormPage(),
+      middlewares: [AuthMiddleware()],
+    ),
+
+    // =====================================================
+    // PARISH & STATIC
+    // =====================================================
+
     GetPage(
       name: Routes.parishes,
       page: () => const ParishesPage(),
@@ -136,42 +188,17 @@ class AppRouter {
       name: Routes.legal,
       page: () => const LegalPage(),
     ),
+
+    // =====================================================
+    // NOTIFICATIONS
+    // =====================================================
+
     GetPage(
       name: Routes.notifications,
       page: () => const NotificationsPage(),
       customTransition: MassTransition(),
       transitionDuration: const Duration(milliseconds: 200),
-    ),
-
-
-
-    // =====================================================
-    // MASS FLOW
-    // =====================================================
-    GetPage(
-      name: Routes.massDetail,
-      page: () {
-        final id = Get.parameters['id'];
-        final mass = mockMasses.firstWhereOrNull((m) => m.id == id);
-
-        if (mass == null) {
-          return MainNavigation(content: const HomePage());
-        }
-
-        return MassLayout(
-          child: MassDetailBasePage.forMass(mass),
-        );
-      },
-      binding: MassBinding(),        // 🔹 binding centralisé
       middlewares: [AuthMiddleware()],
-      customTransition: MassTransition(), // 🔹 transition conservée
-      transitionDuration: const Duration(milliseconds: 300),
     ),
-
-    GetPage(
-      name: Routes.payment,
-      page: () => const PaymentFormPage(),
-    ),
-
   ];
 }

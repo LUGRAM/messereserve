@@ -14,29 +14,35 @@ class AuthController extends GetxController {
   Future<bool> register(String name, String phone, String password) async {
     isLoading.value = true;
 
-    // try {
-    //
-    // } catch (e) {
-    //   return false;
-    // } finally {
-    //   isLoading.value = false;
-    // }
-    final decoded = await _service.register(
-      name: name,
-      phone: phone,
-      password: password,
-    );
+    try {
+      final decoded = await _service.register(
+        name: name,
+        phone: phone,
+        password: password,
+      );
 
-    print(decoded);
+      final token = decoded?['access_token'];
+      final user = decoded?['user']; // attendu côté de l API
 
-    final token = decoded?['access_token'];
+      if (token != null) {
+        _storage.write('auth_token', token);
+        _storage.write('token', token);
 
-    if (token != null) {
-      _storage.write('auth_token', token);
-      return true;
+        // CACHE PROFIL (UX immédiate)
+        if (user != null) {
+          _storage.write('user_id', user['id']);
+          _storage.write('user_name', user['name']);
+          _storage.write('user_email', user['email']);
+          _storage.write('user_phone', user['phone']);
+        }
+
+        return true;
+      }
+
+      return false;
+    } finally {
+      isLoading.value = false;
     }
-
-    return false;
   }
 
   // ========= LOGIN =========
@@ -50,9 +56,20 @@ class AuthController extends GetxController {
       );
 
       final token = decoded?['access_token'];
+      final user = decoded?['user']; //  attendu du  côté de l API
 
       if (token != null) {
         _storage.write('auth_token', token);
+        _storage.write('token', token);
+
+        //  CACHE PROFIL
+        if (user != null) {
+          _storage.write('user_id', user['id']);
+          _storage.write('user_name', user['name']);
+          _storage.write('user_email', user['email']);
+          _storage.write('user_phone', user['phone']);
+        }
+
         return true;
       }
 
@@ -67,8 +84,15 @@ class AuthController extends GetxController {
   // ========= LOGOUT =========
   void logout() {
     _storage.remove('auth_token');
-    _service.logout();
+    _storage.remove('token');
 
+    // Optionnel : vider cache profil
+    _storage.remove('user_id');
+    _storage.remove('user_name');
+    _storage.remove('user_email');
+    _storage.remove('user_phone');
+
+    _service.logout();
     Get.offAllNamed(Routes.login);
   }
 }

@@ -3,128 +3,219 @@ import 'package:get/get.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../controllers/profile_controller.dart';
+import 'edit_profile_sheet.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
 
-  final controller = Get.put(ProfileController());
-  // ---------------------------------------------------------------------------
-  // POPUP DE DECONNEXION
-  // ---------------------------------------------------------------------------
+  final ProfileController controller = Get.put(ProfileController());
+
   void _confirmLogout() {
     Get.dialog(
-      AlertDialog(
-        title: const Text("Déconnexion"),
-        content: const Text("Voulez-vous vraiment vous déconnecter ?"),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text("Annuler")),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Get.back();
-              Get.find<AuthController>().logout();
-            },
-            child: const Text("Déconnecter"),
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // TITRE
+              const Text(
+                "Déconnexion",
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary2,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // MESSAGE
+              const Text(
+                "Souhaitez-vous vraiment vous déconnecter de votre compte ?",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              // ACTIONS
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: Get.back,
+                    child: const Text(
+                      "Annuler",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: AppColors.danger,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.back();
+                      Get.find<AuthController>().logout();
+                    },
+                    child: const Text(
+                      "Déconnecter",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
+      barrierColor: Colors.black.withOpacity(0.45),
     );
   }
-  // ---------------------------------------------------------------------------
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text("Mon profil"),
+        elevation: 0,
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        foregroundColor: AppColors.textPrimary2,
+        title: const Text("Profil"),
       ),
-
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (controller.error.value != null) {
-          return Center(child: Text(controller.error.value!));
-        }
-
-        final user = controller.profile.value!;
+        final user = controller.profile.value;
+        if (user == null) return const SizedBox();
 
         return ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           children: [
-
-            /// HEADER
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.navInactive,
-                  backgroundImage:
-                  user.avatar != null ? NetworkImage(user.avatar!) : null,
-                  child: user.avatar == null
-                      ? const Icon(Icons.person, size: 40, color: Colors.white)
-                      : null,
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary2,
-                      ),
+            // ================= AVATAR =================
+            Center(
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () => Get.to(() => const EditProfileSheet()),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor:
+                      AppColors.primary.withValues(alpha: 0.15),
+                      backgroundImage: user.avatar != null
+                          ? NetworkImage(user.avatar!)
+                          : null,
+                      child: user.avatar == null
+                          ? const Icon(Icons.person,
+                          size: 50, color: AppColors.primary)
+                          : null,
                     ),
-                    const SizedBox(height: 4),
-                    Text(user.email,
-                        style: const TextStyle(
-                            color: AppColors.textSecondary)),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    user.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user.email,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 32),
 
-            const Text("Compte",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            // ================= COMPTE =================
+            _sectionTitle("Compte"),
 
-            _tile(Icons.edit_rounded, "Modifier le profil", () {
-              // route edit profile
-            }),
+            _tile(
+              icon: Icons.edit,
+              title: "Modifier le profil",
+              //onTap: () => Get.to(() => const EditProfileSheet()),
+              onTap: _openEditProfile,
+        ),
 
-            _tile(Icons.lock_rounded, "Changer le mot de passe", () {
-              // route change password
-            }),
 
-            const SizedBox(height: 30),
+            _tile(
+              icon: Icons.language,
+              title: "Langue",
+              onTap: () {},
+            ),
 
-            const Text("Préférences",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-
-            _tile(Icons.language_rounded, "Langue de l’application", () {}),
-            _tile(Icons.dark_mode_rounded,
-                "Mode sombre (bientôt disponible)", () {}),
+            _tile(
+              icon: Icons.dark_mode,
+              title: "Mode sombre",
+              onTap: () {},
+            ),
 
             const SizedBox(height: 40),
 
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade400,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+
+            // ================= LOGOUT =================
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: AppColors.gradientBottom,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                onPressed: _confirmLogout,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.logout_rounded,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      "Déconnexion",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              icon: const Icon(Icons.logout_rounded),
-              label: const Text("Déconnexion",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: _confirmLogout,
             ),
           ],
         );
@@ -132,15 +223,44 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _tile(IconData icon, String title, VoidCallback onTap) {
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: AppColors.textSecondary,
+        ),
+      ),
+    );
+  }
+
+  Widget _tile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.textPrimary2),
+        leading: Icon(icon, color: AppColors.primary),
         title: Text(title),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
     );
   }
+
+  void _openEditProfile() {
+    Get.bottomSheet(
+      const EditProfileSheet(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
 }

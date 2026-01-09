@@ -40,6 +40,7 @@ class ReservationLoadingPage extends StatelessWidget {
                     massTitle: data['display_title'] ?? 'Messe',
                     date: data['display_date'] ?? '',
                     time: data['display_time'] ?? '',
+                    paroisseName: data['paroisse']?['nom'] ?? 'Paroisse non précisée',
                     pastorName: data['pastor']?['nom'],
                   );
 

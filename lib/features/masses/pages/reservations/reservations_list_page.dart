@@ -1,5 +1,6 @@
 // lib/features/masses/pages/reservations/reservations_list_page.dart
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
@@ -56,28 +57,26 @@ class _ReservationsListPageState extends State<ReservationsListPage>
     switch (r.status) {
       case "en_attente_validation":
         return _paymentState(
-          label: "Régler la commande",
-          color: Colors.blueGrey.shade700,
-          icon: Icons.lock,
+          label: "En attente de validation",
+          color: Color(0xff2196f3),
+          icon: FontAwesomeIcons.clockRotateLeft,
           enabled: false,
         );
 
       case "en_attente_paiement":
         return _paymentState(
           label: "Régler la commande",
-          color: Colors.yellow,
-          icon: Icons.lock_open_rounded,
+          color: Color(0xfff39d20),
+          icon: Icons.payment_outlined,
           enabled: true,
         );
 
       case "payee":
-        return _statusBadge("Payée", Colors.blue, Icons.check_circle);
+        return _statusBadge("Payée", Colors.green.shade700, Icons.check_circle);
 
-      case "terminee":
-        return _statusBadge("Terminée", Colors.green, Icons.check_circle);
 
       case "refusee":
-        return _statusBadge("Annulée", Colors.grey.shade700, Icons.cancel);
+        return _statusBadge("Annulée", Colors.blueGrey.shade700, Icons.cancel);
 
       default:
         return const SizedBox();
@@ -270,7 +269,6 @@ class _ReservationsListPageState extends State<ReservationsListPage>
             tabs: const [
               Tab(text: "Demandes"),
               Tab(text: "Succès"),
-              Tab(text: "Terminées"),
               Tab(text: "Annulées"),
             ],
           ),
@@ -291,7 +289,6 @@ class _ReservationsListPageState extends State<ReservationsListPage>
                   ["en_attente_validation", "en_attente_paiement"]),
             ),
             _buildTab(_filterMultiple(["payee"])),
-            _buildTab(_filterMultiple(["terminee"])),
             _buildTab(_filterMultiple(["refusee"])),
           ],
         ),

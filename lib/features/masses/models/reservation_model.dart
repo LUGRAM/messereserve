@@ -49,7 +49,7 @@ class ReservationModel {
       massTitle: messe?['title'] ?? messe?['nom'] ?? 'Messe',
       date: json['date_messe'] ?? '',
       time: json['heure_messe'] ?? '',
-      status: json['statut'] ?? 'en_attente_validation',
+      status: json['statut'] ?? 'en_attente_paiement',
 
       // Logique demandée pour le Pasteur
       pastorName: pretre != null

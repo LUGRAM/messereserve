@@ -88,7 +88,7 @@ class ReservationDetailPage extends StatelessWidget {
             ),
             // Note: Material est nécessaire dans un Hero si tu as du texte ou des formes spécifiques
             // pour éviter les soucis de style pendant le vol, mais pour une icône c'est souvent ok.
-            child: const Icon(Icons.church, size: 40, color: Colors.deepOrange),
+            child: const Icon(Icons.church, size: 40, color: Color(0xfff39d20)),
           ),
         ),
         const SizedBox(height: 16),
@@ -177,7 +177,7 @@ class ReservationDetailPage extends StatelessWidget {
         child: ElevatedButton.icon(
           icon: const Icon(Icons.lock_open_rounded, color: Colors.white),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.yellow,
+            backgroundColor: Color(0xfff39d20),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -203,21 +203,19 @@ class ReservationDetailPage extends StatelessWidget {
         icon = Icons.check_circle;
         text = "Commande terminée";
         break;
-      case "refusee":
       case "payee":
         bgColor = Colors.blue;
         icon = Icons.check_circle;
         text = "Commande payée";
         break;
-      //case "refusee":
-      case "annulee":
+      case "refusee":
         bgColor = Colors.redAccent.withOpacity(0.8);
         icon = Icons.cancel;
         text = "Commande annulée";
         break;
       case "en_attente_validation":
       default:
-        bgColor = Colors.blueGrey.shade400; // Aspect grisé/verrouillé
+        bgColor = Colors.blueGrey; // Aspect grisé/verrouillé
         icon = Icons.lock;
         text = "En attente de validation";
         break;

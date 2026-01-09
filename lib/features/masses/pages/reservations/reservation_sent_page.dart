@@ -7,6 +7,7 @@ import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/app/router/routes.dart';
 
 class ReservationSentPage extends StatelessWidget {
+  final String id;
   final String reference;
   final String massTitle;
   final String date;
@@ -16,6 +17,7 @@ class ReservationSentPage extends StatelessWidget {
 
   const ReservationSentPage({
     super.key,
+    required this.id,
     required this.reference,
     required this.massTitle,
     required this.date,
@@ -321,7 +323,7 @@ class ReservationSentPage extends StatelessWidget {
         ),
         onPressed: () {
           Get.toNamed(
-            Routes.payment.replaceFirst(':reference', reference),
+            Routes.payment.replaceFirst(':id', id),
           );
         },
       ),

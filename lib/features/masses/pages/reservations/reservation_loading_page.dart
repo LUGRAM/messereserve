@@ -36,6 +36,7 @@ class ReservationLoadingPage extends StatelessWidget {
                 case ReservationStatus.success:
                   final data = ctrl.reservationResponse.value!;
                   return ReservationSentPage(
+                    id: data['id'].toString(),
                     reference: data['reference'] ?? 'N/A',
                     massTitle: data['display_title'] ?? 'Messe',
                     date: data['display_date'] ?? '',

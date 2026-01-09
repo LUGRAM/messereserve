@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -168,14 +169,8 @@ class ProfilePage extends StatelessWidget {
 
 
             _tile(
-              icon: Icons.language,
-              title: "Langue",
-              onTap: () {},
-            ),
-
-            _tile(
-              icon: Icons.dark_mode,
-              title: "Mode sombre",
+              icon: FontAwesomeIcons.unlockKeyhole,
+              title: "Changer mot de passe",
               onTap: () {},
             ),
 

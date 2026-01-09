@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
-
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
 import 'package:messeconnect/app/router/routes.dart';
@@ -58,7 +57,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
       case "en_attente_validation":
         return _paymentState(
           label: "En attente de validation",
-          color: Color(0xff2196f3),
+          color: Colors.blueGrey.shade700,
           icon: FontAwesomeIcons.clockRotateLeft,
           enabled: false,
         );
@@ -74,6 +73,8 @@ class _ReservationsListPageState extends State<ReservationsListPage>
       case "payee":
         return _statusBadge("Payée", Colors.green.shade700, Icons.check_circle);
 
+      case "terminee":
+        return _statusBadge("Terminée", Colors.green, Icons.check_circle);
 
       case "refusee":
         return _statusBadge("Annulée", Colors.blueGrey.shade700, Icons.cancel);
@@ -269,6 +270,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
             tabs: const [
               Tab(text: "Demandes"),
               Tab(text: "Succès"),
+              Tab(text: "Terminées"),
               Tab(text: "Annulées"),
             ],
           ),
@@ -289,6 +291,7 @@ class _ReservationsListPageState extends State<ReservationsListPage>
                   ["en_attente_validation", "en_attente_paiement"]),
             ),
             _buildTab(_filterMultiple(["payee"])),
+            _buildTab(_filterMultiple(["terminee"])),
             _buildTab(_filterMultiple(["refusee"])),
           ],
         ),

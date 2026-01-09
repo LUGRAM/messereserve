@@ -203,12 +203,14 @@ class ReservationDetailPage extends StatelessWidget {
         icon = Icons.check_circle;
         text = "Commande terminée";
         break;
+    case "refusee":
       case "payee":
         bgColor = Colors.blue;
         icon = Icons.check_circle;
         text = "Commande payée";
         break;
-      case "refusee":
+      //case "refusee":
+      case "annulee":
         bgColor = Colors.redAccent.withOpacity(0.8);
         icon = Icons.cancel;
         text = "Commande annulée";

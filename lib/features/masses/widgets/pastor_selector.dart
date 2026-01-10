@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../parish/controllers/pastor_controller.dart';
 
@@ -27,7 +28,7 @@ class PastorSelector extends StatelessWidget {
             return ListTile(
               title: Text(pastor.nom),
               subtitle: Text(pastor.telephone),
-              trailing: const Icon(Icons.person),
+              trailing: const Icon(FontAwesomeIcons.userTie),
               onTap: () => Navigator.pop(context, pastor),
             );
           },

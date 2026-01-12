@@ -3,6 +3,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:messeconnect/app/theme/app_colors.dart';
 
+import '../models/info_site.dart';
+import '../services/info_site_service.dart';
+import 'confidentialite_page.dart';
+
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
 
@@ -21,113 +25,104 @@ class SupportPage extends StatelessWidget {
         foregroundColor: Colors.black,
         elevation: 1,
       ),
+      body: FutureBuilder<InfoSite?>(
+        future: InfoSiteService.fetchInfoSite(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+          if (!snapshot.hasData) {
+            return const Center(child: Text("Impossible de charger les informations"));
+          }
 
-          // ------------------------------------------------------------
-          // 🔹 ASSISTANCE UTILISATEUR
-          // ------------------------------------------------------------
-          const Text(
-            "Assistance utilisateur",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 10),
+          final info = snapshot.data!;
 
-          _tile(
-            icon: Icons.help_center_rounded,
-            title: "FAQ – Questions fréquentes",
-            subtitle: "Réponses aux questions courantes",
-            onTap: () {},
-          ),
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
 
-          _tile(
-            icon: Icons.menu_book_rounded,
-            title: "Guide d’utilisation",
-            subtitle: "Tout savoir sur les réservations",
-            onTap: () {},
-          ),
+              // ------------------------------------------------------------
+              // 🔹 SUPPORT DIRECT
+              // ------------------------------------------------------------
+              const Text(
+                "Assistance",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 10),
 
-          const SizedBox(height: 30),
+              if (info.whatsapp != null)
+                _tile(
+                  icon: FontAwesomeIcons.whatsapp,
+                  title: "Assistance WhatsApp",
+                  subtitle: info.whatsapp!,
+                  onTap: () => _open("https://wa.me/${info.whatsapp!.replaceAll('+', '')}"),
+                ),
 
-          // ------------------------------------------------------------
-          // 🔹 SUPPORT DIRECT
-          // ------------------------------------------------------------
-          const Text(
-            "Support direct",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 10),
+              if (info.email != null)
+                _tile(
+                  icon: Icons.email_rounded,
+                  title: "Email support",
+                  subtitle: info.email!,
+                  onTap: () => _open("mailto:${info.email}"),
+                ),
 
-          _tile(
-            icon: FontAwesomeIcons.whatsapp,
-            title: "Assistance WhatsApp",
-            subtitle: "+241 77 06 90 67",
-            onTap: () => _open("https://wa.me/24177069067"),
-          ),
+              if (info.telephone != null)
+                _tile(
+                  icon: Icons.phone_in_talk_rounded,
+                  title: "Appeler le support",
+                  subtitle: info.telephone!,
+                  onTap: () => _open("tel:${info.telephone}"),
+                ),
 
-          _tile(
-            icon: Icons.email_rounded,
-            title: "Email support",
-            subtitle: "support@messeconnect.com",
-            onTap: () => _open("mailto:support@messeconnect.com"),
-          ),
+              const SizedBox(height: 30),
 
-          _tile(
-            icon: Icons.phone_in_talk_rounded,
-            title: "Appeler le support",
-            subtitle: "+241 01 23 45 67",
-            onTap: () => _open("tel:+24101234567"),
-          ),
+              // ------------------------------------------------------------
+              // 🔹 CONFIDENTIALITÉ
+              // ------------------------------------------------------------
+              const Text(
+                "Confidentialité",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 10),
 
-          const SizedBox(height: 30),
+              _tile(
+                icon: Icons.policy,
+                title: "Politique de confidentialité",
+                subtitle: "Consultez nos règles de protection des données",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ConfidentialitePage(
+                        content: info.confidentialite ?? "",
+                      ),
+                    ),
+                  );
+                },
+              ),
 
-          // ------------------------------------------------------------
-          // 🔹 SUPPORT TECHNIQUE
-          // ------------------------------------------------------------
-          const Text(
-            "Support technique",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 10),
+              _tile(
+                icon: Icons.info_outline_rounded,
+                title: "Version de l’application",
+                subtitle: "v1.0.0",
+                onTap: () {},
+              ),
 
-          _tile(
-            icon: Icons.bug_report_rounded,
-            title: "Signaler un bug",
-            subtitle: "Envoyer un rapport technique",
-            onTap: () {},
-          ),
-
-          _tile(
-            icon: Icons.code,
-            title: "Assistance technique",
-            subtitle: "tech@messeconnect.com",
-            onTap: () => _open("mailto:tech@messeconnect.com"),
-          ),
-
-          _tile(
-            icon: Icons.info_outline_rounded,
-            title: "Version de l’application",
-            subtitle: "v1.0.0",
-            onTap: () {},
-          ),
-
-          const SizedBox(height: 30),
-          Center(
-            child: Text(
-              "MesseConnect © ${DateTime.now().year}",
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ),
-        ],
+              const SizedBox(height: 30),
+              Center(
+                child: Text(
+                  "MesseConnect © ${DateTime.now().year}",
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  // ------------------------------------------------------------
-  // WIDGET DE TILE RÉUTILISABLE
-  // ------------------------------------------------------------
   Widget _tile({
     required IconData icon,
     required String title,

@@ -118,7 +118,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
       // ---------------- APPBAR SPOTIFY STYLE ----------------
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.blue,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: AppColors.textPrimary2),

@@ -6,11 +6,13 @@ import '../../../app/theme/app_colors.dart';
 class NeoPhoneField extends StatelessWidget {
   final String? phoneValue;
   final void Function(String)? onChanged;
+  final bool enabled;
 
   const NeoPhoneField({
     super.key,
     this.phoneValue,
     this.onChanged,
+    this.enabled = true,
   });
 
   @override
@@ -36,30 +38,25 @@ class NeoPhoneField extends StatelessWidget {
           ),
         ],
       ),
-      child: IntlPhoneField(
-        // 🇬🇦 GABON FIXE
-        initialValue: phoneVal?.replaceFirst('+241', ''),
+      child:IntlPhoneField(
+        initialValue: phoneValue?.replaceFirst('+241', ''),
         initialCountryCode: 'GA',
 
-        showDropdownIcon: true,
-        showCountryFlag: true,
+        enabled: enabled,                 // ⬅️ champ désactivé
+        readOnly: !enabled,               // ⬅️ empêche le clavier
+        showDropdownIcon: false,           // ⬅️ empêche changement pays
+        disableLengthCheck: true,
 
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-        ],
-
-        keyboardType: TextInputType.phone,
+        keyboardType: TextInputType.none,  // ⬅️ sécurité supplémentaire
+        inputFormatters: enabled
+            ? [FilteringTextInputFormatter.digitsOnly]
+            : [],
 
         decoration: const InputDecoration(
           border: InputBorder.none,
           filled: false,
-          fillColor: Colors.transparent,
           hintText: "Numéro de téléphone",
-          hintStyle: TextStyle(
-            color: AppColors.textSecondary,
-          ),
           counterText: '',
-          errorStyle: TextStyle(height: 0),
         ),
 
         style: const TextStyle(
@@ -72,17 +69,15 @@ class NeoPhoneField extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
 
-        onChanged: (phone) {
-          phoneVal = phone.completeNumber;
+        onChanged: enabled
+            ? (phone) {
           if (onChanged != null) {
-            onChanged!(phoneVal!);
+            onChanged!(phone.completeNumber);
           }
-        },
-
-        validator: (value) =>
-        value == null || value.number.isEmpty
-            ? 'Numéro requis'
+        }
             : null,
+
+        validator: null, // ⬅️ pas de validation si bloqué
       ),
     );
   }

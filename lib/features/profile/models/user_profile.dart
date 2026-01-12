@@ -3,14 +3,14 @@ class UserProfile {
   final String name;
   final String email;
   final String? phone;
-  final String? avatar;
+  final String? photo;
 
   UserProfile({
     required this.id,
     required this.name,
     required this.email,
     this.phone,
-    this.avatar,
+    this.photo,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -19,7 +19,7 @@ class UserProfile {
       name: json['name'],
       email: json['email'],
       phone: json['phone'],
-      avatar: json['avatar'],
+      photo: json['photo'],
     );
   }
 }

@@ -87,19 +87,17 @@ class ApiClient {
     required String fileField,
     required File file,
     Map<String, String>? fields,
+    String method = 'POST',
   }) async {
     final uri = Uri.parse("$baseUrl$endpoint");
-    final request = http.MultipartRequest('POST', uri);
+    final request = http.MultipartRequest(method, uri);
 
-    // Headers auth (sans Content-Type)
     request.headers.addAll(multipartHeaders);
 
-    // Champs texte optionnels
     if (fields != null) {
       request.fields.addAll(fields);
     }
 
-    // Fichier
     request.files.add(
       await http.MultipartFile.fromPath(
         fileField,
@@ -109,4 +107,5 @@ class ApiClient {
 
     return request.send();
   }
+
 }

@@ -126,10 +126,10 @@ class ProfilePage extends StatelessWidget {
                       radius: 50,
                       backgroundColor:
                       AppColors.primary.withValues(alpha: 0.15),
-                      backgroundImage: user.avatar != null
-                          ? NetworkImage(user.avatar!)
+                      backgroundImage: user.photo != null
+                          ? NetworkImage(user.photo!)
                           : null,
-                      child: user.avatar == null
+                      child: user.photo == null
                           ? const Icon(Icons.person,
                           size: 50, color: AppColors.primary)
                           : null,

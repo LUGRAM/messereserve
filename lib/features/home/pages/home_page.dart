@@ -20,9 +20,10 @@ class _HomePageState extends State<HomePage> {
   // 🔹 HEADER
   // -----------------------------------------------------------
   Widget _buildHeader(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const SizedBox(width: 10),
         const Text(
           "MesseConnect",
           style: TextStyle(
@@ -31,8 +32,17 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_none_rounded,
+            color: Colors.white,
+            size: 26,
+          ),
+          onPressed: () => Get.toNamed(Routes.notifications),
+        ),
         const SizedBox(height: 6),
-        Row(
+        /*Row(
+          //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Builder(
               builder: (ctx) => IconButton(
@@ -75,7 +85,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => Get.toNamed(Routes.notifications),
             ),
           ],
-        )
+        )*/
       ],
     );
   }

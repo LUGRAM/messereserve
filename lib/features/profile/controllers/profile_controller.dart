@@ -38,8 +38,11 @@ class ProfileController extends GetxController {
       final data = await _profileService.getProfile();
       profile.value = UserProfile.fromJson(data);
 
+      print("PROFILE LOADED => ${profile.value?.name}");
+
     } catch (e) {
       error.value = e.toString().replaceAll('Exception: ', '');
+      print("LOAD PROFILE ERROR => $error");
     } finally {
       isLoading.value = false;
     }
@@ -64,15 +67,22 @@ class ProfileController extends GetxController {
         password: password,
       );
 
-      // Recharger depuis l’API (source de vérité)
+      // Recharger depuis l'API
       await loadProfile();
 
-      Get.back();
-      Get.snackbar('Succès', 'Profil mis à jour avec succès');
+      Get.back();  // Fermer l'écran d'édition
+
+      Get.snackbar(
+        'Succès',
+        'Profil mis à jour avec succès',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
     } catch (e) {
       Get.snackbar(
         'Erreur',
         e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isLoading.value = false;
@@ -83,28 +93,45 @@ class ProfileController extends GetxController {
   // UPLOAD AVATAR (API)
   // ==========================
   Future<void> pickAndUploadAvatar(ImageSource source) async {
-    print(source);
     try {
-      print("📸 pickAndUploadAvatar CALLED");
+      print("🎯 pickAndUploadAvatar CALLED with source: $source");
+
       final XFile? image = await _picker.pickImage(
         source: source,
         imageQuality: 85,
+        maxWidth: 1024,
+        maxHeight: 1024,
       );
 
-      if (image == null) return;
+      if (image == null) {
+        print("❌ No image selected");
+        return;
+      }
+
+      print("✅ Image selected: ${image.path}");
 
       isLoading.value = true;
 
       await _profileService.uploadAvatar(File(image.path));
 
-      // Recharger profil depuis l’API
+      // Recharger profil depuis l'API
       await loadProfile();
 
-      Get.back();
+      // ⚠️ NE PAS FERMER L'ÉCRAN ICI
+      // L'utilisateur reste sur l'écran d'édition pour voir le résultat
+
+      Get.snackbar(
+        'Succès',
+        'Photo de profil mise à jour',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
     } catch (e) {
+      print("❌ UPLOAD ERROR => $e");
       Get.snackbar(
         'Erreur',
         e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isLoading.value = false;

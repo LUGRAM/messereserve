@@ -21,12 +21,14 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   String? _phoneValue;
+  final _passwordCtrl = TextEditingController();
+  final _confirmPasswordCtrl = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
 
   final ProfileController controller = Get.find();
 
-  // =====================================================
-  // INIT → ALIMENTÉ PAR API (via controller.profile)
-  // =====================================================
   @override
   void initState() {
     super.initState();
@@ -35,22 +37,20 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
     if (user != null) {
       _nameCtrl.text = user.name;
-      _emailCtrl.text = user.email ?? '';
+      _emailCtrl.text = user.email;
       _phoneValue = user.phone;
     }
   }
-
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
     super.dispose();
   }
 
-  // =====================================================
-  // PHOTO OPTIONS (API DIRECT)
-  // =====================================================
   void _openPhotoOptions() {
     Get.bottomSheet(
       Container(
@@ -64,7 +64,10 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
           children: [
             const Text(
               "Photo de profil",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -89,9 +92,6 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     );
   }
 
-  // =====================================================
-  // SAVE PROFILE
-  // =====================================================
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -99,17 +99,14 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
       name: _nameCtrl.text.trim(),
       email: _emailCtrl.text.trim(),
       phone: _phoneValue,
+      password: _passwordCtrl.text.isNotEmpty ? _passwordCtrl.text : null,
     );
   }
 
-  // =====================================================
-  // UI
-  // =====================================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -144,7 +141,6 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
           )),
         ],
       ),
-
       body: Obx(() {
         if (controller.isLoading.value && controller.profile.value == null) {
           return const Center(child: CircularProgressIndicator());
@@ -190,13 +186,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                           child: CircleAvatar(
                             radius: 70,
                             backgroundColor: Colors.white,
-                            backgroundImage: user.photo != null
-                                ? NetworkImage(
-                              "https://admin.itmaster-africa.com/storage/${user.photo}",
-                            )
+                            backgroundImage: user.photoUrl != null
+                                ? NetworkImage(user.photoUrl!)
                                 : null,
-                            child: user.photo == null
-                                ? Icon(
+                            child: user.photoUrl == null
+                                ? const Icon(
                               Icons.person,
                               size: 64,
                               color: AppColors.primary,
@@ -224,7 +218,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       decoration: _inputDecoration("Votre nom"),
                       validator: (v) =>
                       v == null || v.isEmpty ? "Champ requis" : null,
-                      style: TextStyle(color: AppColors.textPrimary2),
+                      style: const TextStyle(color: AppColors.textPrimary2),
                     ),
                   ),
 
@@ -239,11 +233,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                         if (v == null || v.isEmpty) return "Champ requis";
                         final regex =
                         RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
-                        return regex.hasMatch(v)
-                            ? null
-                            : "Email invalide";
+                        return regex.hasMatch(v) ? null : "Email invalide";
                       },
-                      style: TextStyle(color: AppColors.textPrimary2),
+                      style: const TextStyle(color: AppColors.textPrimary2),
                     ),
                   ),
 
@@ -251,6 +243,58 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   NeoPhoneField(
                     phoneValue: _phoneValue,
                     onChanged: (value) => _phoneValue = value,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // ================= MOT DE PASSE =================
+                  _label("Nouveau mot de passe (optionnel)"),
+                  NeoField(
+                    icon: Icons.lock_outline,
+                    child: TextFormField(
+                      controller: _passwordCtrl,
+                      obscureText: _obscurePassword,
+                      decoration: _inputDecoration("**********").copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              size: 20),
+                          onPressed: () =>
+                              setState(() => _obscurePassword = !_obscurePassword),
+                        ),
+                      ),
+                      style: const TextStyle(color: AppColors.textPrimary2),
+                    ),
+                  ),
+
+                  _label("Confirmer le mot de passe"),
+                  NeoField(
+                    icon: Icons.lock_reset,
+                    child: TextFormField(
+                      controller: _confirmPasswordCtrl,
+                      obscureText: _obscureConfirm,
+                      decoration: _inputDecoration("**********").copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                              _obscureConfirm
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              size: 20),
+                          onPressed: () =>
+                              setState(() => _obscureConfirm = !_obscureConfirm),
+                        ),
+                      ),
+                      validator: (v) {
+                        if (_passwordCtrl.text.isNotEmpty &&
+                            v != _passwordCtrl.text) {
+                          return "Les mots de passe ne correspondent pas";
+                        }
+                        return null;
+                      },
+                      style: const TextStyle(color: AppColors.textPrimary2),
+                    ),
                   ),
 
                   const SizedBox(height: 40),
@@ -263,7 +307,6 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     );
   }
 
-  // =====================================================
   Widget _cameraButton() {
     return Container(
       decoration: BoxDecoration(
@@ -288,14 +331,15 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   }
 
   InputDecoration _inputDecoration(String hint) {
-    return const InputDecoration(
+    return InputDecoration(
+      hintText: hint,
       border: InputBorder.none,
     );
   }
 
   Widget _label(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, left: 4),
+      padding: const EdgeInsets.only(bottom: 6, left: 4, top: 12),
       child: Text(
         text,
         style: const TextStyle(

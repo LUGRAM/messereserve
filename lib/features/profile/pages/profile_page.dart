@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -23,7 +22,6 @@ class ProfilePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // TITRE
               const Text(
                 "Déconnexion",
                 style: TextStyle(
@@ -32,10 +30,7 @@ class ProfilePage extends StatelessWidget {
                   color: AppColors.textPrimary2,
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // MESSAGE
               const Text(
                 "Souhaitez-vous vraiment vous déconnecter de votre compte ?",
                 style: TextStyle(
@@ -44,10 +39,7 @@ class ProfilePage extends StatelessWidget {
                   height: 1.4,
                 ),
               ),
-
               const SizedBox(height: 22),
-
-              // ACTIONS
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -61,9 +53,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 8),
-
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -98,7 +88,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,17 +110,19 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   GestureDetector(
-                    onTap: () => Get.to(() => const EditProfileSheet()),
+                    onTap: _openEditProfile,
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor:
-                      AppColors.primary.withValues(alpha: 0.15),
-                      backgroundImage: user.photo != null
-                          ? NetworkImage(user.photo!)
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                      backgroundImage: user.photoUrl != null
+                          ? NetworkImage(user.photoUrl!)
                           : null,
-                      child: user.photo == null
-                          ? const Icon(Icons.person,
-                          size: 50, color: AppColors.primary)
+                      child: user.photoUrl == null
+                          ? const Icon(
+                        Icons.person,
+                        size: 50,
+                        color: AppColors.primary,
+                      )
                           : null,
                     ),
                   ),
@@ -163,19 +154,10 @@ class ProfilePage extends StatelessWidget {
             _tile(
               icon: Icons.edit,
               title: "Modifier le profil",
-              //onTap: () => Get.to(() => const EditProfileSheet()),
               onTap: _openEditProfile,
-        ),
-
-
-            _tile(
-              icon: FontAwesomeIcons.unlockKeyhole,
-              title: "Changer mot de passe",
-              onTap: () {},
             ),
 
             const SizedBox(height: 40),
-
 
             // ================= LOGOUT =================
             SizedBox(
@@ -251,11 +233,11 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _openEditProfile() {
-    Get.bottomSheet(
-      const EditProfileSheet(),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+    // Navigation en plein écran au lieu de bottomSheet
+    Get.to(
+          () => const EditProfileSheet(),
+      transition: Transition.rightToLeft,
+      duration: const Duration(milliseconds: 300),
     );
   }
-
 }

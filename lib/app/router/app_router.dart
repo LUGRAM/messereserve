@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 // Transitions
+import '../../features/profile/controllers/profile_binding.dart';
 import '../transition/blur_transition.dart';
 import '../transition/transitions.dart';
 
@@ -87,6 +88,7 @@ class AppRouter {
       name: Routes.profile,
       page: () => MainNavigation(content: ProfilePage()),
       middlewares: [AuthMiddleware()],
+      binding: ProfileBinding(),
     ),
     GetPage(
       name: Routes.payments,
@@ -97,17 +99,6 @@ class AppRouter {
       name: Routes.support,
       page: () => MainNavigation(content: const SupportPage()),
       middlewares: [AuthMiddleware()],
-    ),
-
-    // =====================================================
-    // PROFILE (SECONDARY)
-    // =====================================================
-
-    GetPage(
-      name: Routes.editProfile,
-      page: () => const EditProfileSheet(),
-      middlewares: [AuthMiddleware()],
-      transition: Transition.upToDown,
     ),
 
     // =====================================================

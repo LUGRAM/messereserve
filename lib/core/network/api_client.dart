@@ -87,19 +87,17 @@ class ApiClient {
     required String fileField,
     required File file,
     Map<String, String>? fields,
+    String method = 'POST',
   }) async {
     final uri = Uri.parse("$baseUrl$endpoint");
-    final request = http.MultipartRequest('POST', uri);
+    final request = http.MultipartRequest(method, uri);
 
-    // Headers auth (sans Content-Type)
     request.headers.addAll(multipartHeaders);
 
-    // Champs texte optionnels
     if (fields != null) {
       request.fields.addAll(fields);
     }
 
-    // Fichier
     request.files.add(
       await http.MultipartFile.fromPath(
         fileField,
@@ -109,4 +107,50 @@ class ApiClient {
 
     return request.send();
   }
+/*
+// ==========================
+  // MULTIPART REQUEST
+  // ==========================
+  static Future<http.StreamedResponse> multipart({
+    required String endpoint,
+    required String fileField,
+    required File file,
+    String method = 'POST',
+    Map<String, String>? additionalFields,
+  }) async {
+    final uri = Uri.parse('$baseUrl$endpoint');
+
+    final request = http.MultipartRequest(method, uri);
+
+    // Ajouter le token d'authentification
+    final token = await _getToken(); // Votre méthode pour récupérer le token
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    // Ajouter le fichier
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        fileField,
+        file.path,
+      ),
+    );
+
+    // Ajouter les champs supplémentaires (comme _method=PUT)
+    if (additionalFields != null) {
+      request.fields.addAll(additionalFields);
+    }
+
+
+    return await request.send();
+  }
+
+  // Méthode privée pour récupérer le token
+  static Future<String?> _getToken() async {
+    // Implémentez votre logique de récupération du token
+    // Exemple avec GetStorage :
+    // return GetStorage().read('token');
+    return null; // À remplacer
+  }
+*/
 }

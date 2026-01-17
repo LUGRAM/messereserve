@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
+import '../../../app/theme/app_colors.dart';
+import '../../../app/widgets/network_error_content.dart';
 import '../controllers/reservation_controller.dart';
 import '../../parish/controllers/paroisse_controller.dart';
 import '../../parish/controllers/pastor_controller.dart';
@@ -61,12 +63,12 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final _benefPrenomCtrl = TextEditingController();
   DateTime? _benefDateDeces;
 
-  @override
+  /*@override
   void initState() {
     super.initState();
     _paroisseCtrl.loadParoisses();
     _pastorCtrl.loadPastors();
-  }
+  }*/
 
   @override
   void dispose() {
@@ -158,33 +160,140 @@ class _MassStepperFormState extends State<MassStepperForm> {
   // ===========================================================================
 
   Future<void> _chooseParoisse() async {
+    if (_paroisseCtrl.paroisses.isEmpty && !_paroisseCtrl.isLoading.value) {
+      _paroisseCtrl.loadParoisses();
+    }
+
     final p = await showModalBottomSheet<ParoisseModel>(
       context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) => Obx(() {
         if (_paroisseCtrl.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
+
+        if (_paroisseCtrl.hasError.value) {
+          return _bottomSheetError(
+            title: "Connexion indisponible",
+            message:
+            "Impossible de charger la liste des paroisses.\nVérifiez votre connexion puis réessayez.",
+            onRetry: _paroisseCtrl.loadParoisses,
+          );
+        }
+
+        if (_paroisseCtrl.paroisses.isEmpty) {
+          return const Center(child: Text("Aucune paroisse disponible"));
+        }
+
         return ListView(
-          children: _paroisseCtrl.paroisses.map((paroisse) {
-            return ListTile(
-              title: Text(paroisse.nom),
-              subtitle: Text(paroisse.address),
-              trailing: const Icon(Icons.church),
-              onTap: () => Get.back(result: paroisse),
-            );
-          }).toList(),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+          children: [
+            // 🔹 Titre (UNE SEULE FOIS)
+            const Text(
+              "Liste des paroisses",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary2,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 🔹 Liste
+            ..._paroisseCtrl.paroisses.map((paroisse) {
+              return ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xff8b8b89),
+                  foregroundColor: Colors.white,
+                  child: Icon(Icons.church_rounded),
+                ),
+                title: Text(paroisse.nom),
+                onTap: () => Get.back(result: paroisse),
+              );
+            }).toList(),
+          ],
         );
       }),
     );
-    if (p != null) setState(() => _selectedParoisse = p);
+
+    if (p != null) {
+      setState(() => _selectedParoisse = p);
+    }
   }
 
   Future<void> _choosePastor() async {
+    if (_pastorCtrl.pastors.isEmpty && !_pastorCtrl.isLoading.value) {
+      _pastorCtrl.loadPastors();
+    }
+
     final p = await showModalBottomSheet<PastorModel>(
       context: context,
-      builder: (_) => const PastorSelector(),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => Obx(() {
+        if (_pastorCtrl.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (_pastorCtrl.hasError.value) {
+          return _bottomSheetError(
+            title: "Connexion indisponible",
+            message:
+            "Impossible de charger la liste des pasteurs.\nVérifiez votre connexion puis réessayez.",
+            onRetry: _pastorCtrl.loadPastors,
+          );
+        }
+
+        if (_pastorCtrl.pastors.isEmpty) {
+          return const Center(child: Text("Aucun pasteur disponible"));
+        }
+
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+          children: [
+            // 🔹 Titre (UNE seule fois)
+            const Text(
+              "Liste des pasteurs",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary2,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 🔹 Items
+            ..._pastorCtrl.pastors.map((pastor) {
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: const Color(0xff8b8b89),
+                  foregroundColor: Colors.white,
+                  backgroundImage:
+                  pastor.photo.isNotEmpty ? NetworkImage(pastor.photo) : null,
+                  /*child: pastor.photo.isEmpty
+                      ? const Icon(FontAwesomeIcons.userTie)
+                      : null,*/
+                  child: Icon(FontAwesomeIcons.userTie),
+                ),
+                title: Text(pastor.nom),
+                subtitle:
+                pastor.telephone.isNotEmpty ? Text(pastor.telephone) : null,
+                onTap: () => Get.back(result: pastor),
+              );
+            }).toList(),
+          ],
+        );
+      }),
     );
-    if (p != null) setState(() => _selectedPastor = p);
+
+    if (p != null) {
+      setState(() => _selectedPastor = p);
+    }
   }
 
   Future<void> _pickDateTime() async {
@@ -664,6 +773,27 @@ class _MassStepperFormState extends State<MassStepperForm> {
       _submit();
     }
   }
+
+  Widget _bottomSheetError({
+    required String title,
+    required String message,
+    required VoidCallback onRetry,
+  }) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        child: NetworkErrorContent(
+          title: title,
+          message: message,
+          onRetry: onRetry,
+          showClose: true,
+          onClose: () => Get.back(),
+        ),
+      ),
+    );
+  }
+
+
 
 // Helper pour éviter la répétition de code GetX
   void _showErrorSnackBar(String message) {

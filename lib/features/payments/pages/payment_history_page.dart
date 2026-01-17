@@ -4,6 +4,8 @@ import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/features/masses/models/reservation_model.dart';
 import 'package:messeconnect/features/masses/services/reservation_api.dart';
 
+import '../../../app/widgets/network_error_card.dart';
+
 class PaymentHistoryPage extends StatefulWidget {
   const PaymentHistoryPage({super.key});
 
@@ -13,7 +15,10 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   List<ReservationModel> _paidReservations = [];
+
   bool _loading = true;
+  bool _hasError = false;
+
   final GetStorage _box = GetStorage();
 
   String? get token => _box.read("token");
@@ -25,34 +30,85 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Future<void> _loadPayments() async {
-    final all = await ReservationApi.fetchReservations(token!);
-    setState(() {
-      _paidReservations = all.where((r) => r.status == "terminee").toList();
-      _loading = false;
-    });
+    try {
+      if (token == null) throw Exception("Token absent");
+
+      final all = await ReservationApi.fetchReservations(token!);
+
+      setState(() {
+        _paidReservations =
+            all.where((r) => r.status == "terminee").toList();
+        _loading = false;
+        _hasError = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _hasError = true;
+        _paidReservations = [];
+      });
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
+
+        /*appBar: AppBar(
+          title: const Text("Historique des paiements"),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          centerTitle: true,
+          elevation: 1,
+        ),*/
+
         appBar: AppBar(
           title: const Text("Historique des paiements"),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           centerTitle: true,
           elevation: 1,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                setState(() {
+                  _loading = true;
+                });
+                _loadPayments();
+              },
+            )
+          ],
         ),
+
         body: _loading
             ? const Center(child: CircularProgressIndicator())
+            : _hasError
+            ? NetworkErrorCard(
+          title: "Connexion indisponible",
+          message:
+          "Impossible de charger l’historique des paiements.\nVérifiez votre connexion puis réessayez.",
+          onRetry: () {
+            setState(() {
+              _loading = true;
+              _hasError = false;
+            });
+            _loadPayments();
+          },
+        )
             : _paidReservations.isEmpty
             ? _emptyView()
             : ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: _paidReservations.length,
-          itemBuilder: (_, i) => _paymentCard(_paidReservations[i]),
+          itemBuilder: (_, i) =>
+              _paymentCard(_paidReservations[i]),
         ),
+
+
       ),
     );
   }
@@ -64,15 +120,21 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         children: [
           Icon(Icons.receipt_long, size: 64, color: Colors.white70),
           SizedBox(height: 16),
-          Text("Aucun paiement trouvé",
-              style: TextStyle(fontSize: 18, color: Colors.white)),
+          Text(
+            "Aucun paiement trouvé",
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
           SizedBox(height: 8),
-          Text("Vos paiements s'afficheront ici une fois effectués.",
-              style: TextStyle(color: Colors.white70)),
+          Text(
+            "Vos paiements apparaîtront ici après validation.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white70),
+          ),
         ],
       ),
     );
   }
+
 
   Widget _paymentCard(ReservationModel r) {
     return Container(

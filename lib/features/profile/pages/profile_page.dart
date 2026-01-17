@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../../app/widgets/network_error_card.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../controllers/profile_controller.dart';
 import 'edit_profile_sheet.dart';
@@ -84,7 +85,7 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
       ),
-      barrierColor: Colors.black.withOpacity(0.45),
+      barrierColor: Colors.black.withValues(alpha: 0.45),
     );
   }
 
@@ -99,8 +100,24 @@ class ProfilePage extends StatelessWidget {
         title: const Text("Profil"),
       ),
       body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (controller.hasError.value) {
+          return NetworkErrorCard(
+            title: "Connexion indisponible",
+            message:
+            "Impossible de charger les informations.\nVérifiez votre connexion internet puis réessayez.",
+            onRetry: controller.loadProfile,
+          );
+
+        }
         final user = controller.profile.value;
-        if (user == null) return const SizedBox();
+        if (user == null) {
+          return const Center(
+            child: Text("Aucune information utilisateur disponible"),
+          );
+        }
 
         return ListView(
           padding: const EdgeInsets.all(20),
@@ -112,18 +129,16 @@ class ProfilePage extends StatelessWidget {
                   GestureDetector(
                     onTap: _openEditProfile,
                     child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                      backgroundImage: user.photoUrl != null
-                          ? NetworkImage(user.photoUrl!)
-                          : null,
+                      radius: 70,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
                       child: user.photoUrl == null
-                          ? const Icon(
-                        Icons.person,
-                        size: 50,
-                        color: AppColors.primary,
-                      )
+                          ? const Icon(Icons.person, size: 64)
                           : null,
+                      // On ajoute un mécanisme de secours si l'image réseau échoue
+                      onBackgroundImageError: (exception, stackTrace) {
+                        debugPrint("Erreur de chargement image: $exception");
+                      },
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -226,7 +241,7 @@ class ProfilePage extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon, color: AppColors.primary),
         title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: onTap,
       ),
     );

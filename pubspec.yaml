@@ -27,7 +27,7 @@ dependencies:
   flutter_html: ^3.0.0
 
   # Pour utiliser des fonts custom (ex: Poppins)
-  google_fonts: ^6.3.2
+  google_fonts: ^7.0.2
   cupertino_icons: ^1.0.8
 
 dev_dependencies:

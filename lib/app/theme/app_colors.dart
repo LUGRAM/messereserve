@@ -20,7 +20,8 @@ class AppColors {
   // 🎨 IDENTITÉ VISUELLE PRINCIPALE — PALETTE MODERNE
   // ---------------------------------------------------------------------------
 
-  static const Color primary = Color(0xFFC64E1B);
+  //static const Color primary = Color(0xFFC64E1B);
+  static const Color primary = Color(0xFFF9415C);
   static const Color primaryDark = Color(0xFF990E58);
   static const Color accent = Color(0xFFC216CE);
 

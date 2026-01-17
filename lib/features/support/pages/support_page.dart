@@ -3,12 +3,32 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:messeconnect/app/theme/app_colors.dart';
 
+import '../../../app/widgets/network_error_card.dart';
 import '../models/info_site.dart';
 import '../services/info_site_service.dart';
 import 'confidentialite_page.dart';
 
-class SupportPage extends StatelessWidget {
+class SupportPage extends StatefulWidget {
   const SupportPage({super.key});
+
+  @override
+  State<SupportPage> createState() => _SupportPageState();
+}
+
+class _SupportPageState extends State<SupportPage> {
+  late Future<InfoSite?> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = InfoSiteService.fetchInfoSite();
+  }
+
+  void _reload() {
+    setState(() {
+      _future = InfoSiteService.fetchInfoSite();
+    });
+  }
 
   Future<void> _open(String url) async {
     final uri = Uri.parse(url);
@@ -26,19 +46,31 @@ class SupportPage extends StatelessWidget {
         elevation: 1,
       ),
       body: FutureBuilder<InfoSite?>(
-        future: InfoSiteService.fetchInfoSite(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      future: _future,
+      builder: (context, snapshot) {
 
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Impossible de charger les informations"));
-          }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          final info = snapshot.data!;
+        if (snapshot.hasError) {
+          return NetworkErrorCard(
+            title: "Connexion indisponible",
+            message:
+            "Impossible de charger les informations.\nVérifiez votre connexion internet puis réessayez.",
+            onRetry: _reload,
+          );
+        }
 
-          return ListView(
+
+        if (!snapshot.hasData) {
+          return const Center(child: Text("Impossible de charger les informations"));
+        }
+
+        final info = snapshot.data!;
+
+
+        return ListView(
             padding: const EdgeInsets.all(16),
             children: [
 

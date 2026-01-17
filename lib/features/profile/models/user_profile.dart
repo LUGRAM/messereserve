@@ -26,11 +26,11 @@ class UserProfile {
   /// Retourne l'URL complète de la photo si elle existe
   String? get photoUrl {
     if (photo == null || photo!.isEmpty) return null;
-
-    // Si l'URL est déjà complète
     if (photo!.startsWith('http')) return photo;
 
-    // Sinon, construire l'URL complète
-    return 'https://admin.itmaster-africa.com/storage/$photo';
+    // On nettoie les éventuels antislashes envoyés par le JSON
+    final cleanPath = photo!.replaceAll(r'\/', '/');
+
+    return 'https://admin.itmaster-africa.com/storage/$cleanPath';
   }
 }

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 
 import '../../app/router/routes.dart';
@@ -73,17 +74,17 @@ class _SplashPageState extends State<SplashPage> {
               const SizedBox(height: 24),
               Text(
                 'MesseConnect',
-                style: Theme.of(context)
+                /*style: Theme.of(context)
                     .textTheme
                     .headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                    ?.copyWith(fontWeight: FontWeight.bold),*/
+                  style: GoogleFonts.playfair( color: Colors.white, fontSize: 35, fontWeight: FontWeight.bold)
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Text(
                 'réserver vos messes sans vous déplacer',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary1.withOpacity(0.9),
-                ),
+                //style: Theme.of(context).textTheme.bodyMedium?.copyWith( color: AppColors.textPrimary1.withOpacity(0.9),fontStyle: FontStyle.italic ),
+                style: GoogleFonts.playfair(color: AppColors.textPrimary1.withValues(alpha: 0.9), fontSize: 16, fontWeight: FontWeight.w700, fontStyle: FontStyle.italic, wordSpacing: 2.0)
               ),
             ],
           ),

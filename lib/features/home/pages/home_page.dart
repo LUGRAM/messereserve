@@ -1,6 +1,7 @@
 // lib/features/home/pages/home_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:messeconnect/app/widgets/gradient_background.dart';
 import 'package:messeconnect/app/widgets/service_card.dart';
@@ -20,73 +21,80 @@ class _HomePageState extends State<HomePage> {
   // 🔹 HEADER
   // -----------------------------------------------------------
   Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column (
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const SizedBox(width: 10),
-        const Text(
-          "MesseConnect",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.notifications_none_rounded,
-            color: Colors.white,
-            size: 26,
-          ),
-          onPressed: () => Get.toNamed(Routes.notifications),
-        ),
-        const SizedBox(height: 6),
-        /*Row(
-          //mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Builder(
-              builder: (ctx) => IconButton(
-                icon: const Icon(Icons.menu_rounded,
-                    color: Colors.white, size: 28),
-                onPressed: () => Scaffold.of(ctx).openDrawer(),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Container(
-                height: 38,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
+        const SizedBox(height: 20),
+        Row (
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "MesseConnect",
+                /*style: TextStyle(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),*/
+                  style: GoogleFonts.playfair( color: Colors.white, fontSize: 35, fontWeight: FontWeight.bold)
+              ),
+              /*IconButton(
+                icon: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white,
+                  size: 26,
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search, color: Colors.grey.shade600),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Rechercher une messe...",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
+                onPressed: () => Get.toNamed(Routes.notifications),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Builder(
+                    builder: (ctx) => IconButton(
+                      icon: const Icon(Icons.menu_rounded,
+                          color: Colors.white, size: 28),
+                      onPressed: () => Scaffold.of(ctx).openDrawer(),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Container(
+                      height: 38,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.grey.shade600),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Rechercher une messe...",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            IconButton(
-              icon: const Icon(
-                Icons.notifications_none_rounded,
-                color: Colors.white,
-                size: 26,
-              ),
-              onPressed: () => Get.toNamed(Routes.notifications),
-            ),
-          ],
-        )*/
-      ],
+                  ),
+                  const SizedBox(width: 10),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.notifications_none_rounded,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                    onPressed: () => Get.toNamed(Routes.notifications),
+                  ),
+                ],
+              )*/
+            ],
+          ),
+        const SizedBox(height: 10),
+      ]
     );
   }
 

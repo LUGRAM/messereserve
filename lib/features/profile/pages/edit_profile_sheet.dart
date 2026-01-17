@@ -67,6 +67,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary2
               ),
             ),
             const SizedBox(height: 16),
@@ -151,157 +152,179 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
           return const Center(child: Text("Profil indisponible"));
         }
 
-        return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.background,
-                Color(0xFFFFF1F3),
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(20),
-                children: [
-                  // ================= AVATAR =================
-                  Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Opacity(
-                          opacity: 0.22,
-                          child: Lottie.asset(
-                            'assets/lottie/halo_soft.json',
-                            width: 190,
-                            height: 190,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _openPhotoOptions,
-                          child: CircleAvatar(
-                            radius: 70,
-                            backgroundColor: Colors.white,
-                            backgroundImage: user.photoUrl != null
-                                ? NetworkImage(user.photoUrl!)
-                                : null,
-                            child: user.photoUrl == null
-                                ? const Icon(
-                              Icons.person,
-                              size: 64,
-                              color: AppColors.primary,
-                            )
-                                : null,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 20,
-                          right: 20,
-                          child: _cameraButton(),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // ================= FORM =================
-                  _label("Nom"),
-                  NeoField(
-                    icon: Icons.person_outline,
-                    child: TextFormField(
-                      controller: _nameCtrl,
-                      decoration: _inputDecoration("Votre nom"),
-                      validator: (v) =>
-                      v == null || v.isEmpty ? "Champ requis" : null,
-                      style: const TextStyle(color: AppColors.textPrimary2),
-                    ),
-                  ),
-
-                  _label("Email"),
-                  NeoField(
-                    icon: Icons.email_outlined,
-                    child: TextFormField(
-                      controller: _emailCtrl,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: _inputDecoration("email@example.com"),
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return "Champ requis";
-                        final regex =
-                        RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
-                        return regex.hasMatch(v) ? null : "Email invalide";
-                      },
-                      style: const TextStyle(color: AppColors.textPrimary2),
-                    ),
-                  ),
-
-                  _label("Téléphone"),
-                  NeoPhoneField(
-                    phoneValue: _phoneValue,
-                    onChanged: (value) => _phoneValue = value,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ================= MOT DE PASSE =================
-                  _label("Nouveau mot de passe (optionnel)"),
-                  NeoField(
-                    icon: Icons.lock_outline,
-                    child: TextFormField(
-                      controller: _passwordCtrl,
-                      obscureText: _obscurePassword,
-                      decoration: _inputDecoration("**********").copyWith(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              size: 20),
-                          onPressed: () =>
-                              setState(() => _obscurePassword = !_obscurePassword),
+        return Stack(
+          children : [
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.background,
+                    Color(0xFFFFF1F3),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      // ================= AVATAR =================
+                      Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Opacity(
+                              opacity: 0.22,
+                              child: Lottie.asset(
+                                'assets/lottie/halo_soft.json',
+                                width: 190,
+                                height: 190,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: _openPhotoOptions,
+                              child: CircleAvatar(
+                                radius: 70,
+                                backgroundColor: Colors.grey[200],
+                                backgroundImage: user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+                                child: user.photoUrl == null
+                                    ? const Icon(Icons.person, size: 64)
+                                    : null,
+                                // Ajoute un mécanisme de secours si l'image réseau échoue
+                                onBackgroundImageError: (exception, stackTrace) {
+                                  debugPrint("Erreur de chargement image: $exception");
+                                },
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 30,
+                              right: 20,
+                              child: _cameraButton(),
+                            ),
+                          ],
                         ),
                       ),
-                      style: const TextStyle(color: AppColors.textPrimary2),
-                    ),
-                  ),
 
-                  _label("Confirmer le mot de passe"),
-                  NeoField(
-                    icon: Icons.lock_reset,
-                    child: TextFormField(
-                      controller: _confirmPasswordCtrl,
-                      obscureText: _obscureConfirm,
-                      decoration: _inputDecoration("**********").copyWith(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                              _obscureConfirm
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              size: 20),
-                          onPressed: () =>
-                              setState(() => _obscureConfirm = !_obscureConfirm),
+                      const SizedBox(height: 32),
+
+                      // ================= FORM =================
+                      _label("Nom"),
+                      NeoField(
+                        icon: Icons.person_outline,
+                        child: TextFormField(
+                          controller: _nameCtrl,
+                          decoration: _inputDecoration("Votre nom"),
+                          validator: (v) =>
+                          v == null || v.isEmpty ? "Champ requis" : null,
+                          style: const TextStyle(color: AppColors.textPrimary2),
                         ),
                       ),
-                      validator: (v) {
-                        if (_passwordCtrl.text.isNotEmpty &&
-                            v != _passwordCtrl.text) {
-                          return "Les mots de passe ne correspondent pas";
-                        }
-                        return null;
-                      },
-                      style: const TextStyle(color: AppColors.textPrimary2),
-                    ),
-                  ),
 
-                  const SizedBox(height: 40),
-                ],
+                      _label("Email"),
+                      NeoField(
+                        icon: Icons.email_outlined,
+                        child: TextFormField(
+                          controller: _emailCtrl,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: _inputDecoration("email@example.com"),
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return "Champ requis";
+                            final regex =
+                            RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$');
+                            return regex.hasMatch(v) ? null : "Email invalide";
+                          },
+                          style: const TextStyle(color: AppColors.textPrimary2),
+                        ),
+                      ),
+
+                      _label("Téléphone"),
+                      NeoPhoneField(
+                        phoneValue: _phoneValue,
+                        onChanged: (value) => _phoneValue = value,
+                        enabled: false,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      //============Divider====================
+                      const Divider(
+                        height: 20,      // Espace total occupé (incluant le vide autour)
+                        thickness: 1,    // Épaisseur de la ligne
+                        indent: 20,     // Retrait à gauche
+                        endIndent: 20,  // Retrait à droite
+                        color: Colors.grey,
+                      ),
+
+
+                      const SizedBox(height: 8),
+                      _label("SÉCURITÉ"),
+                      const SizedBox(height: 8),
+                      // ================= MOT DE PASSE =================
+                      _label("Nouveau mot de passe (optionnel)"),
+                      NeoField(
+                        icon: Icons.lock_outline,
+                        child: TextFormField(
+                          controller: _passwordCtrl,
+                          obscureText: _obscurePassword,
+                          decoration: _inputDecoration("**********").copyWith(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  size: 20),
+                              onPressed: () =>
+                                  setState(() => _obscurePassword = !_obscurePassword),
+                            ),
+                          ),
+                          style: const TextStyle(color: AppColors.textPrimary2),
+                        ),
+                      ),
+
+                      _label("Confirmer le mot de passe"),
+                      NeoField(
+                        icon: Icons.lock_reset,
+                        child: TextFormField(
+                          controller: _confirmPasswordCtrl,
+                          obscureText: _obscureConfirm,
+                          decoration: _inputDecoration("**********").copyWith(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                  _obscureConfirm
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  size: 20),
+                              onPressed: () =>
+                                  setState(() => _obscureConfirm = !_obscureConfirm),
+                            ),
+                          ),
+                          validator: (v) {
+                            if (_passwordCtrl.text.isNotEmpty &&
+                                v != _passwordCtrl.text) {
+                              return "Les mots de passe ne correspondent pas";
+                            }
+                            return null;
+                          },
+                          style: const TextStyle(color: AppColors.textPrimary2),
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
+            if (controller.isLoading.value)
+              Container(
+                color: Colors.black.withValues(alpha: 0.2), // Assombrit légèrement l'écran
+                child: const Center(
+                ),
+              ),
+          ]
         );
       }),
     );
@@ -310,19 +333,20 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   Widget _cameraButton() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
+        /*color: Colors.white,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
             color: AppColors.border,
             blurRadius: 6,
           ),
-        ],
+        ],*/
       ),
       child: IconButton(
         icon: const Icon(
           Icons.camera_alt,
-          size: 18,
+          size: 25,
           color: AppColors.primaryDark,
         ),
         onPressed: _openPhotoOptions,

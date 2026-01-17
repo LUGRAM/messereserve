@@ -13,6 +13,7 @@ class ProfileController extends GetxController {
   // STATE
   // ==========================
   final isLoading = false.obs;
+  var hasError = false.obs;
   final profile = Rxn<UserProfile>();
   final error = ''.obs;
 
@@ -34,6 +35,7 @@ class ProfileController extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
+      hasError.value = false;
 
       final data = await _profileService.getProfile();
       profile.value = UserProfile.fromJson(data);
@@ -41,6 +43,7 @@ class ProfileController extends GetxController {
       print("PROFILE LOADED => ${profile.value?.name}");
 
     } catch (e) {
+      hasError.value = true;
       error.value = e.toString().replaceAll('Exception: ', '');
       print("LOAD PROFILE ERROR => $error");
     } finally {
@@ -94,7 +97,7 @@ class ProfileController extends GetxController {
   // ==========================
   Future<void> pickAndUploadAvatar(ImageSource source) async {
     try {
-      print("🎯 pickAndUploadAvatar CALLED with source: $source");
+      print(" pickAndUploadAvatar CALLED with source: $source");
 
       final XFile? image = await _picker.pickImage(
         source: source,
@@ -104,11 +107,11 @@ class ProfileController extends GetxController {
       );
 
       if (image == null) {
-        print("❌ No image selected");
+        print(" No image selected");
         return;
       }
 
-      print("✅ Image selected: ${image.path}");
+      print(" Image selected: ${image.path}");
 
       isLoading.value = true;
 
@@ -117,7 +120,7 @@ class ProfileController extends GetxController {
       // Recharger profil depuis l'API
       await loadProfile();
 
-      // ⚠️ NE PAS FERMER L'ÉCRAN ICI
+      //  NE PAS FERMER L'ÉCRAN ICI
       // L'utilisateur reste sur l'écran d'édition pour voir le résultat
 
       Get.snackbar(
@@ -127,7 +130,7 @@ class ProfileController extends GetxController {
       );
 
     } catch (e) {
-      print("❌ UPLOAD ERROR => $e");
+      print(" UPLOAD ERROR => $e");
       Get.snackbar(
         'Erreur',
         e.toString().replaceAll('Exception: ', ''),

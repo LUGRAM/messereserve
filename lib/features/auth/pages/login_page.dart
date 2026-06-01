@@ -35,6 +35,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    print("Tentative de connexion: Phone=${_phoneCtrl.text}, Pass=${_passwordCtrl.text}");
+
     final success = await _auth.login(
       _phoneCtrl.text,
       _passwordCtrl.text,
@@ -47,6 +49,8 @@ class _LoginPageState extends State<LoginPage> {
         "Connexion échouée",
         "Numéro ou mot de passe incorrect",
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
       );
     }
   }
@@ -72,10 +76,15 @@ class _LoginPageState extends State<LoginPage> {
 
                   IntlPhoneField(
                     initialCountryCode: 'GA',
+                    invalidNumberMessage: "Numéro de téléphone invalide",
                     decoration: InputDecoration(
                       hintText: "Numéro de téléphone",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(50),
+                      ),
+                      errorStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     onChanged: (phone) =>
@@ -93,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                     icon: Icons.lock_outline,
                     obscure: true,
                     controller: _passwordCtrl,
+                    maxLength: 8,
                   ),
 
                   const SizedBox(height: 24),

@@ -42,7 +42,14 @@ class PrimaryButton extends StatelessWidget {
           minimumSize: const Size(double.infinity, 52),
         ),
         child: isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+              )
             : Text(label),
       ),
     );

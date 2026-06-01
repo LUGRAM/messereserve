@@ -51,6 +51,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
   ParoisseModel? _selectedParoisse;
   PastorModel? _selectedPastor;
   DateTime? _dateTime;
+  bool _withChoir = false;
 
   // Demandeur
   final _nomCtrl = TextEditingController();
@@ -354,6 +355,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
       beneficiaryPrenom: widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null,
       // Utilise la variable sécurisée ici
       beneficiaryDateDeces: formattedDateDeces,
+      withChoir: _withChoir,
     );
 
     Get.to(() => ReservationLoadingPage());
@@ -522,7 +524,49 @@ class _MassStepperFormState extends State<MassStepperForm> {
             ),
           ),
         ),
+
+        // --- SELECTION CHORALE ---
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          child: Row(
+            children: [
+              const Text(
+                "Chorale :",
+                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(width: 25),
+              _buildChoirOption("Avec", true),
+              const SizedBox(width: 20),
+              _buildChoirOption("Sans", false),
+            ],
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _buildChoirOption(String label, bool value) {
+    final bool isSelected = _withChoir == value;
+    return InkWell(
+      onTap: () => setState(() => _withChoir = value),
+      child: Row(
+        children: [
+          Icon(
+            isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+            color: isSelected ? Colors.white : Colors.white38,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.white60,
+              fontSize: 16,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -534,8 +578,10 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final RegExp _phoneRegExp = RegExp(r"^[0-9]{8,15}$");
 
   String? _validateName(String? value) {
-    if (value == null || value.trim().isEmpty) return "Ce champ est obligatoire";
-    if (!_nameRegExp.hasMatch(value.trim())) return "Format invalide (Lettres uniquement)";
+    final v = value?.trim() ?? "";
+    if (v.isEmpty) return "Ce champ est obligatoire";
+    if (v.length < 2) return "Trop court (minimum 2 caractères)";
+    if (!RegExp(r"^[a-zA-ZÀ-ÿ\s\-]+$").hasMatch(v)) return "Lettres uniquement";
     return null;
   }
   //======================================================================================
@@ -587,26 +633,39 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
   Widget _buildStep2() {
     final bool isRequiem = widget.id.toLowerCase().contains("requiem");
+    final bool isIntention = widget.id.toLowerCase().contains("intention");
 
     return Column(
       children: [
         _fieldContainer(
           child: TextFormField(
             controller: _benefNomCtrl,
-            decoration: _input(isRequiem ? "Nom du défunt" : "Nom du bénéficiaire"),
+            decoration: _input(isRequiem
+                ? "Nom du défunt"
+                : isIntention
+                    ? "Objet de l'intention"
+                    : "Nom du bénéficiaire"),
             style: const TextStyle(color: Colors.white),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
-            validator: (v) => (v == null || v.trim().isEmpty) ? "Champ obligatoire" : null,
+            // On retire le formateur de texte pour l'intention pour permettre plus de liberté
+            inputFormatters: isIntention
+                ? []
+                : [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))
+                  ],
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? "Champ obligatoire" : null,
           ),
         ),
-        _fieldContainer(
-          child: TextFormField(
-            controller: _benefPrenomCtrl,
-            decoration: _input(isRequiem ? "Prénom du défunt" : "Prénom du bénéficiaire"),
-            style: const TextStyle(color: Colors.white),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
+        if (!isIntention)
+          _fieldContainer(
+            child: TextFormField(
+              controller: _benefPrenomCtrl,
+              decoration: _input(isRequiem ? "Prénom du défunt" : "Prénom du bénéficiaire"),
+              style: const TextStyle(color: Colors.white),
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
+            ),
           ),
-        ),
         if (isRequiem)
           _fieldContainer(
             // On harmonise le design avec une icône comme pour la Step 0
@@ -644,6 +703,8 @@ class _MassStepperFormState extends State<MassStepperForm> {
       return "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
     }
 
+    final bool isIntention = widget.id.toLowerCase().contains("intention");
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -652,6 +713,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
         _summaryRow("Paroisse", _selectedParoisse?.nom ?? "—"),
         _summaryRow("Date", formatDate(_dateTime)),
         _summaryRow("Heure", formatTime(_dateTime)),
+        _summaryRow("Chorale", _withChoir ? "Avec chorale" : "Sans chorale", icon: Icons.music_note),
         _summaryRow("Pasteur", _selectedPastor?.nom ?? "Non spécifié"),
 
         const Divider(color: Colors.white24, height: 24),
@@ -673,6 +735,12 @@ class _MassStepperFormState extends State<MassStepperForm> {
               "Date du décès",
               formatDate(_benefDateDeces),
               icon: Icons.calendar_today_outlined
+          ),
+        ] else if (isIntention) ...[
+          _summaryRow(
+              "Intention",
+              _benefNomCtrl.text.trim(),
+              icon: Icons.auto_awesome
           ),
         ] else if (_benefNomCtrl.text.trim().isNotEmpty) ...[
           _summaryRow(

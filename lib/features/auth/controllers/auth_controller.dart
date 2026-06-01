@@ -10,6 +10,18 @@ class AuthController extends GetxController {
 
   final isLoading = false.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    // DEBUG: Afficher les infos en cache pour récupération
+    print("--- DEBUG AUTH STORAGE ---");
+    print("User ID: ${_storage.read('user_id')}");
+    print("User Name: ${_storage.read('user_name')}");
+    print("User Phone: ${_storage.read('user_phone')}");
+    print("Token: ${_storage.read('token')}");
+    print("--------------------------");
+  }
+
   // ========= REGISTER =========
   Future<bool> register(String name, String phone, String password) async {
     isLoading.value = true;

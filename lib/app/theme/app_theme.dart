@@ -32,6 +32,10 @@ class AppTheme {
           color: AppColors.inputHint,
           fontWeight: FontWeight.w500,
         ),
+        errorStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

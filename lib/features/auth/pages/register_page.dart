@@ -39,6 +39,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    print("Tentative d'inscription: Nom=${_nameCtrl.text}, Phone=${_phoneCtrl.text}, Pass=${_passCtrl.text}");
+
     final success = await _auth.register(
       _nameCtrl.text,
       _phoneCtrl.text,
@@ -54,6 +56,8 @@ class _RegisterPageState extends State<RegisterPage> {
         "Inscription échouée",
         "Impossible de créer le compte. Vérifiez vos informations.",
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.white,
+        colorText: Colors.black,
       );
     }
   }
@@ -82,8 +86,23 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   IntlPhoneField(
                     initialCountryCode: 'GA',
+                    invalidNumberMessage: "Numéro de téléphone invalide",
+                    decoration: InputDecoration(
+                      hintText: "Numéro de téléphone",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      errorStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     onChanged: (phone) =>
                     _phoneCtrl.text = phone.completeNumber,
+                    validator: (value) =>
+                    value == null || value.number.isEmpty
+                        ? 'Numéro requis'
+                        : null,
                   ),
 
                   const SizedBox(height: 16),
@@ -93,6 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     icon: Icons.lock_outline,
                     obscure: true,
                     controller: _passCtrl,
+                    maxLength: 8,
                   ),
 
                   const SizedBox(height: 16),
@@ -102,6 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     icon: Icons.check_circle_outline,
                     obscure: true,
                     controller: _confirmCtrl,
+                    maxLength: 8,
                     validator: (v) =>
                     v != _passCtrl.text ? 'Non conforme' : null,
                   ),

@@ -18,6 +18,7 @@ class ReservationRequest {
   final String? beneficiaryNom;
   final String? beneficiaryPrenom;
   final String? beneficiaryDateDeces; // YYYY-MM-DD (REQUiem)
+  final bool withChoir;
 
   ReservationRequest({
     required this.massServiceId,
@@ -34,6 +35,7 @@ class ReservationRequest {
     this.beneficiaryNom,
     this.beneficiaryPrenom,
     this.beneficiaryDateDeces,
+    this.withChoir = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,6 +46,7 @@ class ReservationRequest {
       "pretre_id": pastorId,
       "date_messe": scheduledDate,
       "heure_messe": scheduledTime,
+      "with_choir": withChoir ? 1 : 0,
 
       // ===== Demandeur =====
       "nom": requesterNom,

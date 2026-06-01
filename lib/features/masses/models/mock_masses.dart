@@ -54,4 +54,17 @@ final List<MassModel> mockMasses = [
     requiresBeneficiary: true,
   ),
 
+  MassModel(
+    apiId: 5,
+    id: "intention",
+    title: "Intention de Messe",
+    amount: "2000",
+    subtitle: "Vœux & prières",
+    imageAsset: "assets/images/masses/intention.jpg",
+    heroTag: "messe_intention",
+    accentColor: const Color(0xFF670faf),
+    lottieAsset: "assets/lottie/pray.json",
+    requiresBeneficiary: true,
+  ),
+
 ];

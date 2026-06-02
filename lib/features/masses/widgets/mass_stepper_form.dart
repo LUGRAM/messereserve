@@ -56,26 +56,42 @@ class _MassStepperFormState extends State<MassStepperForm> {
   // Demandeur
   final _nomCtrl = TextEditingController();
   final _prenomCtrl = TextEditingController();
-  final _nationaliteCtrl = TextEditingController();
   final _telephoneCtrl = TextEditingController();
 
-  // Bénéficiaire (Requiem)
+  // Bénéficiaire / Intention
   final _benefNomCtrl = TextEditingController();
   final _benefPrenomCtrl = TextEditingController();
   DateTime? _benefDateDeces;
 
-  /*@override
-  void initState() {
-    super.initState();
-    _paroisseCtrl.loadParoisses();
-    _pastorCtrl.loadPastors();
-  }*/
+  // --- LOGIQUE INTENTIONS ---
+  final List<String> _intentionsList = [
+    "Action de grâce",
+    "Demande de guérison / Santé",
+    "Repos de l'âme d'un défunt",
+    "Réussite aux examens / Concours",
+    "Paix et protection de la famille",
+    "Recherche d'emploi / Travail",
+    "Bénédiction pour un voyage",
+    "Conversion d'un proche",
+    "Anniversaire de naissance",
+    "Anniversaire de mariage / Jubilé",
+    "Naissance / Baptême d'un enfant",
+    "Fin d'une épreuve / Grâce obtenue",
+    "Anniversaire de décès",
+    "Pour les âmes du Purgatoire",
+    "Difficultés financières / Logement",
+    "Discernement / Choix de vie",
+    "Force dans l'épreuve / Consolation",
+    "Pour la Paix dans le monde",
+    //"Intention particulière (secrète)",
+    //"Autre intention particulière",
+  ];
+  String? _selectedIntention;
 
   @override
   void dispose() {
     _nomCtrl.dispose();
     _prenomCtrl.dispose();
-    _nationaliteCtrl.dispose();
     _telephoneCtrl.dispose();
     _benefNomCtrl.dispose();
     _benefPrenomCtrl.dispose();
@@ -108,32 +124,36 @@ class _MassStepperFormState extends State<MassStepperForm> {
   InputDecoration _input(String hint) => InputDecoration(
     filled: false,
     fillColor: Colors.transparent,
-
     border: InputBorder.none,
     enabledBorder: InputBorder.none,
     focusedBorder: InputBorder.none,
     errorBorder: InputBorder.none,
     focusedErrorBorder: InputBorder.none,
-
     hintText: hint,
     hintStyle: const TextStyle(color: Colors.white54),
-
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-
   );
-
 
   // ===========================================================================
   // VALIDATIONS
   // ===========================================================================
 
   bool _validateStep0() {
+    final bool isIntention = widget.id.toLowerCase().contains("intention");
+    if (isIntention && _selectedIntention == null) {
+      _showErrorSnackBar("Veuillez sélectionner une intention.");
+      return false;
+    }
+    /*if (isIntention && _selectedIntention == "Autre intention particulière" && _benefNomCtrl.text.trim().isEmpty) {
+      _showErrorSnackBar("Veuillez préciser votre intention.");
+      return false;
+    }*/
     if (_selectedParoisse == null) {
-      Get.snackbar("Paroisse requise", "Veuillez choisir une paroisse");
+      _showErrorSnackBar("Veuillez choisir une paroisse.");
       return false;
     }
     if (_dateTime == null) {
-      Get.snackbar("Date requise", "Veuillez choisir la date et l'heure");
+      _showErrorSnackBar("Veuillez choisir la date et l'heure.");
       return false;
     }
     return true;
@@ -142,15 +162,16 @@ class _MassStepperFormState extends State<MassStepperForm> {
   bool _validateStep1() => _formKey.currentState!.validate();
 
   bool _validateStep2() {
+    final bool isRequiem = widget.id.toLowerCase().contains("requiem");
     if (!widget.requiresBeneficiary) return true;
 
     if (_benefNomCtrl.text.trim().isEmpty) {
-      Get.snackbar("Bénéficiaire requis", "Nom du défunt obligatoire");
+      _showErrorSnackBar(isRequiem ? "Nom du défunt obligatoire" : "Nom du bénéficiaire obligatoire");
       return false;
     }
 
-    if (_benefDateDeces == null && widget.id =='requiem') {
-      Get.snackbar("Date manquante","Date du décès obligatoire");
+    if (_benefDateDeces == null && isRequiem) {
+      _showErrorSnackBar("Date du décès obligatoire");
       return false;
     }
     return true;
@@ -175,155 +196,67 @@ class _MassStepperFormState extends State<MassStepperForm> {
         if (_paroisseCtrl.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (_paroisseCtrl.hasError.value) {
           return _bottomSheetError(
             title: "Connexion indisponible",
-            message:
-            "Impossible de charger la liste des paroisses.\nVérifiez votre connexion puis réessayez.",
+            message: "Impossible de charger la liste des paroisses.",
             onRetry: _paroisseCtrl.loadParoisses,
           );
         }
-
-        if (_paroisseCtrl.paroisses.isEmpty) {
-          return const Center(child: Text("Aucune paroisse disponible"));
-        }
-
         return ListView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           children: [
-            // 🔹 Titre (UNE SEULE FOIS)
-            const Text(
-              "Liste des paroisses",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary2,
-              ),
-            ),
+            const Text("Liste des paroisses", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary2)),
             const SizedBox(height: 16),
-
-            // 🔹 Liste
-            ..._paroisseCtrl.paroisses.map((paroisse) {
-              return ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Color(0xff8b8b89),
-                  foregroundColor: Colors.white,
-                  child: Icon(Icons.church_rounded),
-                ),
-                title: Text(paroisse.nom),
-                onTap: () => Get.back(result: paroisse),
-              );
-            }).toList(),
+            ..._paroisseCtrl.paroisses.map((paroisse) => ListTile(
+              leading: const CircleAvatar(backgroundColor: Color(0xff8b8b89), foregroundColor: Colors.white, child: Icon(Icons.church_rounded)),
+              title: Text(paroisse.nom),
+              onTap: () => Get.back(result: paroisse),
+            )),
           ],
         );
       }),
     );
-
-    if (p != null) {
-      setState(() => _selectedParoisse = p);
-    }
+    if (p != null) setState(() => _selectedParoisse = p);
   }
 
   Future<void> _choosePastor() async {
     if (_pastorCtrl.pastors.isEmpty && !_pastorCtrl.isLoading.value) {
       _pastorCtrl.loadPastors();
     }
-
     final p = await showModalBottomSheet<PastorModel>(
       context: context,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => Obx(() {
-        if (_pastorCtrl.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (_pastorCtrl.hasError.value) {
-          return _bottomSheetError(
-            title: "Connexion indisponible",
-            message:
-            "Impossible de charger la liste des pasteurs.\nVérifiez votre connexion puis réessayez.",
-            onRetry: _pastorCtrl.loadPastors,
-          );
-        }
-
-        if (_pastorCtrl.pastors.isEmpty) {
-          return const Center(child: Text("Aucun pasteur disponible"));
-        }
-
+        if (_pastorCtrl.isLoading.value) return const Center(child: CircularProgressIndicator());
         return ListView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           children: [
-            // 🔹 Titre (UNE seule fois)
-            const Text(
-              "Liste des pasteurs",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary2,
-              ),
-            ),
+            const Text("Liste des pasteurs", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary2)),
             const SizedBox(height: 16),
-
-            // 🔹 Items
-            ..._pastorCtrl.pastors.map((pastor) {
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: const Color(0xff8b8b89),
-                  foregroundColor: Colors.white,
-                  backgroundImage:
-                  pastor.photo.isNotEmpty ? NetworkImage(pastor.photo) : null,
-                  /*child: pastor.photo.isEmpty
-                      ? const Icon(FontAwesomeIcons.userTie)
-                      : null,*/
-                  child: Icon(FontAwesomeIcons.userTie),
-                ),
-                title: Text(pastor.nom),
-                subtitle:
-                pastor.telephone.isNotEmpty ? Text(pastor.telephone) : null,
-                onTap: () => Get.back(result: pastor),
-              );
-            }).toList(),
+            ..._pastorCtrl.pastors.map((pastor) => ListTile(
+              leading: const CircleAvatar(backgroundColor: Color(0xff8b8b89), foregroundColor: Colors.white, child: Icon(FontAwesomeIcons.userTie)),
+              title: Text(pastor.nom),
+              onTap: () => Get.back(result: pastor),
+            )),
           ],
         );
       }),
     );
-
-    if (p != null) {
-      setState(() => _selectedPastor = p);
-    }
+    if (p != null) setState(() => _selectedPastor = p);
   }
 
   Future<void> _pickDateTime() async {
-    final d = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
+    final d = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 365)));
     if (d == null) return;
-
-    final t = await showTimePicker(
-      context: context,
-      initialTime: const TimeOfDay(hour: 9, minute: 0),
-    );
+    final t = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 9, minute: 0));
     if (t == null) return;
-
-    setState(() {
-      _dateTime = DateTime(d.year, d.month, d.day, t.hour, t.minute);
-    });
+    setState(() => _dateTime = DateTime(d.year, d.month, d.day, t.hour, t.minute));
   }
 
   Future<void> _pickDateDeces() async {
-    final d = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 1)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
+    final d = await showDatePicker(context: context, initialDate: DateTime.now().subtract(const Duration(days: 1)), firstDate: DateTime(1900), lastDate: DateTime.now());
     if (d != null) setState(() => _benefDateDeces = d);
   }
 
@@ -332,28 +265,30 @@ class _MassStepperFormState extends State<MassStepperForm> {
   // ===========================================================================
 
   Future<void> _submit() async {
-    // 1. On prépare la date de décès de manière sécurisée
     String? formattedDateDeces;
     if (widget.requiresBeneficiary && _benefDateDeces != null) {
       formattedDateDeces = "${_benefDateDeces!.year}-${_benefDateDeces!.month.toString().padLeft(2, '0')}-${_benefDateDeces!.day.toString().padLeft(2, '0')}";
     }
 
+    final bool isRequiem = widget.id.toLowerCase().contains("requiem");
+    final bool isIntention = widget.id.toLowerCase().contains("intention");
+    
+    String finalIntention = _selectedIntention ?? "";
+    if (finalIntention == "Autre intention particulière") {
+      finalIntention = _benefNomCtrl.text.trim();
+    }
+
     final req = ReservationRequest(
       massServiceId: widget.apiId,
-      scheduledDate:
-      "${_dateTime!.year}-${_dateTime!.month.toString().padLeft(2, '0')}-${_dateTime!.day.toString().padLeft(2, '0')}",
-      scheduledTime:
-      "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
-
-      paroisseId: _selectedParoisse!.id, // ignoré côté backend pour l’instant
+      scheduledDate: "${_dateTime!.year}-${_dateTime!.month.toString().padLeft(2, '0')}-${_dateTime!.day.toString().padLeft(2, '0')}",
+      scheduledTime: "${_dateTime!.hour}:${_dateTime!.minute.toString().padLeft(2, '0')}",
+      paroisseId: _selectedParoisse!.id,
       pastorId: _selectedPastor?.id,
       requesterNom: _nomCtrl.text.trim(),
       requesterPrenom: _prenomCtrl.text.trim(),
-      requesterNationalite: _nationaliteCtrl.text.trim(),
       requesterTelephone: _telephoneCtrl.text.trim(),
-      beneficiaryNom: widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null,
-      beneficiaryPrenom: widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null,
-      // Utilise la variable sécurisée ici
+      beneficiaryNom: isIntention ? finalIntention : (widget.requiresBeneficiary ? _benefNomCtrl.text.trim() : null),
+      beneficiaryPrenom: isIntention ? null : (widget.requiresBeneficiary ? _benefPrenomCtrl.text.trim() : null),
       beneficiaryDateDeces: formattedDateDeces,
       withChoir: _withChoir,
     );
@@ -362,515 +297,189 @@ class _MassStepperFormState extends State<MassStepperForm> {
     await _reservationCtrl.submitReservation(req, widget.massTitle);
   }
 
-
-  // ===========================================================================
-  // BUILD
-  // ===========================================================================
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 12),
-          if (_currentStep == 0) _buildStep0(),
-          if (_currentStep == 1) _buildStep1(),
-          if (_currentStep == 2) _buildStep2(),
-          if (_currentStep == 3) _buildStep3(),
-          const SizedBox(height: 16),
-          _buildButtons(),
-        ],
-      ),
-    );
-  }
-
   // ===========================================================================
   // STEPS UI
   // ===========================================================================
-  Widget _buildHeader() {
-    const labels = ["Infos", "Demandeur", "Bénéficiaire", "Résumé"];
-    return Row(
-      children: List.generate(4, (i) {
-        final bool active = _currentStep == i;
-        final bool done = _currentStep > i;
-        return Expanded(
-          child: Column(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: done ? Colors.white : active ? widget.accentColor : Colors.white24,
-                ),
-                child: done
-                    ? const Icon(
-                  Icons.check,
-                  size: 16,
-                  color: Colors.white, // Ou widget.accentColor selon ton design
-                )
-                    : Text(
-                  "${i + 1}",
-                  style: TextStyle(
-                    color: active ? Colors.white : Colors.white70,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(labels[i],
-                  style: TextStyle(
-                      fontSize: 10,
-                      color: active ? Colors.white : Colors.white54,
-                      fontWeight: active ? FontWeight.bold : FontWeight.normal
-                  )),
-            ],
-          ),
-        );
-      }),
-    );
-  }
 
   Widget _buildStep0() {
-
+    final bool isIntention = widget.id.toLowerCase().contains("intention");
     String _formatDateTime(DateTime? dt) {
       if (dt == null) return "Choisir date & heure";
-
-      // Utilisation de padLeft pour garantir le format 01/01 au lieu de 1/1
-      String d = dt.day.toString().padLeft(2, '0');
-      String m = dt.month.toString().padLeft(2, '0');
-      String y = dt.year.toString();
-      String h = dt.hour.toString().padLeft(2, '0');
-      String min = dt.minute.toString().padLeft(2, '0');
-
-      return "$d/$m/$y  -  $h:$min";
+      return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} - ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
     }
 
     return Column(
       children: [
-        // --- CHAMP PAROISSE ---
-        _fieldContainer(
-          child: InkWell(
-            onTap: _chooseParoisse, // Corrigé : _chooseParoisse au lieu de _choosePastor
-            borderRadius: BorderRadius.circular(15),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.church_outlined, color: Colors.white70, size: 22),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Text(
-                      _selectedParoisse?.nom ?? "Choisir une paroisse",
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+        if (isIntention) ...[
+          _fieldContainer(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButtonFormField<String>(
+                value: _selectedIntention,
+                decoration: _input("Sélectionnez votre intention"),
+                dropdownColor: AppColors.primaryDark,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
+                items: _intentionsList.map((String value) => DropdownMenuItem<String>(value: value, child: Text(value))).toList(),
+                onChanged: (newValue) => setState(() => _selectedIntention = newValue),
               ),
             ),
           ),
+          if (_selectedIntention == "Autre intention particulière")
+            _fieldContainer(
+              child: TextFormField(
+                controller: _benefNomCtrl, // On utilise ce champ pour "Autre"
+                decoration: _input("Précisez votre intention...").copyWith(counterText: ""),
+                style: const TextStyle(color: Colors.white),
+                maxLength: 200,
+              ),
+            ),
+        ],
+        _fieldContainer(
+          child: InkWell(
+            onTap: _chooseParoisse,
+            borderRadius: BorderRadius.circular(15),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
+              child: Row(children: [
+                const Icon(Icons.church_outlined, color: Colors.white70, size: 22),
+                const SizedBox(width: 15),
+                Expanded(child: Text(_selectedParoisse?.nom ?? "Choisir une paroisse", style: const TextStyle(color: Colors.white, fontSize: 16), overflow: TextOverflow.ellipsis)),
+              ]),
+            ),
+          ),
         ),
-        //const SizedBox(height: 12), // Espacement entre les champs
-
-        // --- CHAMP PASTEUR ---
         _fieldContainer(
           child: InkWell(
             onTap: _choosePastor,
             borderRadius: BorderRadius.circular(15),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-              child: Row(
-                children: [
-                  const FaIcon(FontAwesomeIcons.userTie, color: Colors.white70, size: 20),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Text(
-                      _selectedPastor?.nom ?? "Choisir un pasteur (optionnel)",
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+              child: Row(children: [
+                const FaIcon(FontAwesomeIcons.userTie, color: Colors.white70, size: 20),
+                const SizedBox(width: 15),
+                Expanded(child: Text(_selectedPastor?.nom ?? "Choisir un pasteur (optionnel)", style: const TextStyle(color: Colors.white, fontSize: 16), overflow: TextOverflow.ellipsis)),
+              ]),
             ),
           ),
         ),
-        //const SizedBox(height: 12),
-
-        // --- CHAMP DATE & HEURE ---
         _fieldContainer(
           child: InkWell(
             onTap: _pickDateTime,
             borderRadius: BorderRadius.circular(15),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today_outlined, color: Colors.white70, size: 20),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Text(
-                      _formatDateTime(_dateTime),
-                      style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 0.5),
-                    ),
-                  ),
-                  const Icon(Icons.access_time_rounded, color: Colors.white70, size: 18),
-                ],
-              ),
+              child: Row(children: [
+                const Icon(Icons.calendar_today_outlined, color: Colors.white70, size: 20),
+                const SizedBox(width: 15),
+                Expanded(child: Text(_formatDateTime(_dateTime), style: const TextStyle(color: Colors.white, fontSize: 16))),
+                const Icon(Icons.access_time_rounded, color: Colors.white70, size: 18),
+              ]),
             ),
           ),
         ),
-
-        // --- SELECTION CHORALE ---
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-          child: Row(
-            children: [
-              const Text(
-                "Chorale :",
-                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(width: 25),
-              _buildChoirOption("Avec", true),
-              const SizedBox(width: 20),
-              _buildChoirOption("Sans", false),
-            ],
-          ),
+          child: Row(children: [
+            const Text("Chorale :", style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500)),
+            const SizedBox(width: 25),
+            _buildChoirOption("Avec", true),
+            const SizedBox(width: 20),
+            _buildChoirOption("Sans", false),
+          ]),
         ),
       ],
     );
   }
 
-  Widget _buildChoirOption(String label, bool value) {
-    final bool isSelected = _withChoir == value;
-    return InkWell(
-      onTap: () => setState(() => _withChoir = value),
-      child: Row(
-        children: [
-          Icon(
-            isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-            color: isSelected ? Colors.white : Colors.white38,
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.white60,
-              fontSize: 16,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  //==================================pour le data integry===============================
-  // Validation Nom/Prénom : Uniquement lettres, espaces, tirets (2 min)
-  final RegExp _nameRegExp = RegExp(r"^[a-zA-ZÀ-ÿ\s\-]{2,30}$");
-
-  // Validation Téléphone : Chiffres uniquement (ex: 8 à 15 chiffres selon le pays)
-  final RegExp _phoneRegExp = RegExp(r"^[0-9]{8,15}$");
-
-  String? _validateName(String? value) {
-    final v = value?.trim() ?? "";
-    if (v.isEmpty) return "Ce champ est obligatoire";
-    if (v.length < 2) return "Trop court (minimum 2 caractères)";
-    if (!RegExp(r"^[a-zA-ZÀ-ÿ\s\-]+$").hasMatch(v)) return "Lettres uniquement";
-    return null;
-  }
-  //======================================================================================
-
   Widget _buildStep1() => Column(children: [
-    _fieldContainer(
-      child: TextFormField(
-        controller: _nomCtrl,
-        decoration: _input("Nom"),
-        // Empêche de taper des chiffres/symboles en temps réel
-        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
-        validator: _validateName,
-        style: const TextStyle(color: Colors.white),
-      ),
-    ),
-    _fieldContainer(
-      child: TextFormField(
-        controller: _prenomCtrl,
-        decoration: _input("Prénom"),
-        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
-        validator: _validateName,
-        style: const TextStyle(color: Colors.white),
-      ),
-    ),
-    _fieldContainer(
-      child: TextFormField(
-        controller: _nationaliteCtrl,
-        decoration: _input("Nationalité"),
-        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
-        validator: _validateName,
-        style: const TextStyle(color: Colors.white),
-      ),
-    ),
-    _fieldContainer(
-      child: TextFormField(
-        controller: _telephoneCtrl,
-        keyboardType: TextInputType.phone, // Ouvre le clavier numérique
-        decoration: _input("Téléphone (ex: 077000001)"),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Bloque tout sauf chiffres
-        validator: (v) {
-          if (v == null || v.isEmpty) return "Obligatoire";
-          if (!_phoneRegExp.hasMatch(v)) return "Numéro invalide (8-15 chiffres)";
-          return null;
-        },
-        style: const TextStyle(color: Colors.white),
-      ),
-    ),
+    _fieldContainer(child: TextFormField(controller: _nomCtrl, decoration: _input("Nom"), inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))], validator: _validateName, style: const TextStyle(color: Colors.white))),
+    _fieldContainer(child: TextFormField(controller: _prenomCtrl, decoration: _input("Prénom"), inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))], validator: _validateName, style: const TextStyle(color: Colors.white))),
+    _fieldContainer(child: TextFormField(controller: _telephoneCtrl, keyboardType: TextInputType.phone, decoration: _input("Téléphone"), inputFormatters: [FilteringTextInputFormatter.digitsOnly], style: const TextStyle(color: Colors.white))),
   ]);
 
   Widget _buildStep2() {
     final bool isRequiem = widget.id.toLowerCase().contains("requiem");
-    final bool isIntention = widget.id.toLowerCase().contains("intention");
-
+    if (!widget.requiresBeneficiary) return const Center(child: Text("Pas d'informations supplémentaires requises", style: TextStyle(color: Colors.white)));
+    
     return Column(
       children: [
-        _fieldContainer(
-          child: TextFormField(
-            controller: _benefNomCtrl,
-            decoration: _input(isRequiem
-                ? "Nom du défunt"
-                : isIntention
-                    ? "Objet de l'intention"
-                    : "Nom du bénéficiaire"),
-            style: const TextStyle(color: Colors.white),
-            // On retire le formateur de texte pour l'intention pour permettre plus de liberté
-            inputFormatters: isIntention
-                ? []
-                : [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))
-                  ],
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? "Champ obligatoire" : null,
-          ),
-        ),
-        if (!isIntention)
-          _fieldContainer(
-            child: TextFormField(
-              controller: _benefPrenomCtrl,
-              decoration: _input(isRequiem ? "Prénom du défunt" : "Prénom du bénéficiaire"),
-              style: const TextStyle(color: Colors.white),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"[a-zA-ZÀ-ÿ\s\-]"))],
-            ),
-          ),
+        _fieldContainer(child: TextFormField(controller: _benefNomCtrl, decoration: _input(isRequiem ? "Nom du défunt" : "Nom du bénéficiaire"), style: const TextStyle(color: Colors.white))),
+        _fieldContainer(child: TextFormField(controller: _benefPrenomCtrl, decoration: _input(isRequiem ? "Prénom du défunt" : "Prénom du bénéficiaire"), style: const TextStyle(color: Colors.white))),
         if (isRequiem)
-          _fieldContainer(
-            // On harmonise le design avec une icône comme pour la Step 0
-            child: InkWell(
-              onTap: _pickDateDeces,
-              borderRadius: BorderRadius.circular(15),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-                child: Row(
-                  children: [
-                    Text(
-                      _benefDateDeces == null
-                          ? "Date du décès"
-                          : "${_benefDateDeces!.day.toString().padLeft(2,'0')}/${_benefDateDeces!.month.toString().padLeft(2,'0')}/${_benefDateDeces!.year}",
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          _fieldContainer(child: InkWell(onTap: _pickDateDeces, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15), child: Text(_benefDateDeces == null ? "Date du décès" : "${_benefDateDeces!.day}/${_benefDateDeces!.month}/${_benefDateDeces!.year}", style: const TextStyle(color: Colors.white))))),
       ],
     );
   }
 
   Widget _buildStep3() {
-    // Helper local pour formater proprement les dates
-    String formatDate(DateTime? d) {
-      if (d == null) return "—";
-      return "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
-    }
-
-    String formatTime(DateTime? d) {
-      if (d == null) return "—";
-      return "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
-    }
-
     final bool isIntention = widget.id.toLowerCase().contains("intention");
+    String formatDate(DateTime? d) => d == null ? "—" : "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
+    String formatTime(DateTime? d) => d == null ? "—" : "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _summaryRow("Type de messe", widget.massTitle),
-        const SizedBox(height: 6),
         _summaryRow("Paroisse", _selectedParoisse?.nom ?? "—"),
         _summaryRow("Date", formatDate(_dateTime)),
         _summaryRow("Heure", formatTime(_dateTime)),
-        _summaryRow("Chorale", _withChoir ? "Avec chorale" : "Sans chorale", icon: Icons.music_note),
-        _summaryRow("Pasteur", _selectedPastor?.nom ?? "Non spécifié"),
-
+        _summaryRow("Chorale", _withChoir ? "Avec" : "Sans", icon: Icons.music_note),
+        if (isIntention) _summaryRow("Intention", (_selectedIntention == "Autre intention particulière" ? _benefNomCtrl.text : _selectedIntention) ?? "—", icon: Icons.auto_awesome),
         const Divider(color: Colors.white24, height: 24),
-
-        _summaryRow("Demandeur", "${_nomCtrl.text.trim()} ${_prenomCtrl.text.trim()}"),
-        _summaryRow("Nationalité", _nationaliteCtrl.text.trim().isNotEmpty ? _nationaliteCtrl.text.trim() : "—"),
-        _summaryRow("Téléphone", _telephoneCtrl.text.trim()),
-
-        const Divider(color: Colors.white24, height: 24),
-
-        // Affichage dynamique selon le type de messe
-        if (widget.id.toLowerCase().contains("requiem")) ...[
-          _summaryRow(
-              "Défunt",
-              "${_benefNomCtrl.text.trim()} ${_benefPrenomCtrl.text.trim()}",
-              icon: FontAwesomeIcons.dove // Rappel visuel du deuil
-          ),
-          _summaryRow(
-              "Date du décès",
-              formatDate(_benefDateDeces),
-              icon: Icons.calendar_today_outlined
-          ),
-        ] else if (isIntention) ...[
-          _summaryRow(
-              "Intention",
-              _benefNomCtrl.text.trim(),
-              icon: Icons.auto_awesome
-          ),
-        ] else if (_benefNomCtrl.text.trim().isNotEmpty) ...[
-          _summaryRow(
-              "Bénéficiaire",
-              "${_benefNomCtrl.text.trim()} ${_benefPrenomCtrl.text.trim()}"
-          ),
-        ],
+        _summaryRow("Demandeur", "${_nomCtrl.text} ${_prenomCtrl.text}"),
+        _summaryRow("Téléphone", _telephoneCtrl.text),
+        if (!isIntention && widget.requiresBeneficiary) ...[
+           const Divider(color: Colors.white24, height: 24),
+           _summaryRow("Bénéficiaire", "${_benefNomCtrl.text} ${_benefPrenomCtrl.text}"),
+        ]
       ],
     );
   }
 
-  Widget _summaryRow(String label, String value, {IconData? icon}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      children: [
-        if (icon != null) ...[
-          Icon(icon, size: 14, color: Colors.white38),
-          const SizedBox(width: 8),
-        ],
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-  Widget _buildButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Row(
-        children: [
-          if (_currentStep > 0)
-            Expanded(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.white30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                onPressed: () => setState(() => _currentStep--),
-                child: const Text("Précédent", style: TextStyle(color: Colors.white)),
-              ),
-            ),
-          if (_currentStep > 0) const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.2), // Verre dépoli
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-              ),
-              onPressed: _handleNavigation,
-              child: Text(_currentStep < 3 ? "Suivant" : "Envoyer"),
-            ),
-          ),
-        ],
-      ),
-    );
+  // ... (Reste des widgets helpers comme _buildHeader, _buildButtons, _buildTargetOption, _summaryRow, _buildChoirOption, _showErrorSnackBar, etc.)
+  Widget _buildHeader() {
+    const labels = ["Infos", "Demandeur", "Bénéficiaire", "Résumé"];
+    return Row(children: List.generate(4, (i) => Expanded(child: Column(children: [
+      AnimatedContainer(duration: const Duration(milliseconds: 300), padding: const EdgeInsets.all(8), decoration: BoxDecoration(shape: BoxShape.circle, color: _currentStep >= i ? widget.accentColor : Colors.white24), child: Text("${i + 1}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+      const SizedBox(height: 4),
+      Text(labels[i], style: TextStyle(fontSize: 10, color: _currentStep == i ? Colors.white : Colors.white54)),
+    ]))));
   }
+
+  Widget _summaryRow(String label, String value, {IconData? icon}) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
+    if (icon != null) Icon(icon, size: 14, color: Colors.white54),
+    const SizedBox(width: 8),
+    Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+    const Spacer(),
+    Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+  ]));
+
+  Widget _buildChoirOption(String label, bool value) {
+    final isSelected = _withChoir == value;
+    return InkWell(onTap: () => setState(() => _withChoir = value), child: Row(children: [Icon(isSelected ? Icons.radio_button_checked : Icons.radio_button_off, color: Colors.white, size: 20), const SizedBox(width: 8), Text(label, style: const TextStyle(color: Colors.white))]));
+  }
+
+  Widget _buildButtons() => Padding(padding: const EdgeInsets.only(top: 20), child: Row(children: [
+    if (_currentStep > 0) Expanded(child: OutlinedButton(onPressed: () => setState(() => _currentStep--), child: const Text("Précédent", style: TextStyle(color: Colors.white)))),
+    if (_currentStep > 0) const SizedBox(width: 12),
+    Expanded(child: ElevatedButton(onPressed: _handleNavigation, child: Text(_currentStep < 3 ? "Suivant" : "Envoyer"))),
+  ]));
 
   void _handleNavigation() {
-    // ÉTAPE 0 : Validation personnalisée (Sélecteurs)
-    if (_currentStep == 0) {
-      if (_validateStep0()) {
-        setState(() => _currentStep++);
-      }
-      return;
-    }
-
-    // ÉTAPES 1 & 2 : Validation des TextFormFields
-    if (_currentStep == 1 || _currentStep == 2) {
-      if (_formKey.currentState!.validate()) {
-        if (_currentStep == 2 && !_validateStep2()) return;
-
-        setState(() => _currentStep++);
-      } else {
-        _showErrorSnackBar("Veuillez remplir correctement tous les champs.");
-      }
-      return;
-    }
-
-    // ÉTAPE 3 : Soumission finale
-    if (_currentStep == 3) {
-      _submit();
-    }
+    if (_currentStep == 0 && _validateStep0()) setState(() => _currentStep++);
+    else if (_currentStep == 1 && _validateStep1()) setState(() => _currentStep++);
+    else if (_currentStep == 2 && _validateStep2()) setState(() => _currentStep++);
+    else if (_currentStep == 3) _submit();
   }
 
-  Widget _bottomSheetError({
-    required String title,
-    required String message,
-    required VoidCallback onRetry,
-  }) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
-        child: NetworkErrorContent(
-          title: title,
-          message: message,
-          onRetry: onRetry,
-          showClose: true,
-          onClose: () => Get.back(),
-        ),
-      ),
-    );
+  void _showErrorSnackBar(String message) { Get.snackbar("Erreur", message, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white); }
+  
+  Widget _bottomSheetError({required String title, required String message, required VoidCallback onRetry}) => Container(padding: const EdgeInsets.all(20), child: Column(mainAxisSize: MainAxisSize.min, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), Text(message), ElevatedButton(onPressed: onRetry, child: const Text("Réessayer"))]));
+
+  String? _validateName(String? v) => (v == null || v.trim().length < 2) ? "Minimum 2 caractères" : null;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(key: _formKey, child: Column(children: [_buildHeader(), const SizedBox(height: 20), if (_currentStep == 0) _buildStep0() else if (_currentStep == 1) _buildStep1() else if (_currentStep == 2) _buildStep2() else _buildStep3(), _buildButtons()]));
   }
-
-
-
-// Helper pour éviter la répétition de code GetX
-  void _showErrorSnackBar(String message) {
-    Get.snackbar(
-      "Validation",
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.redAccent.withOpacity(0.8),
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(15),
-    );
-  }}
+}

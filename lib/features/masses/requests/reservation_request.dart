@@ -11,7 +11,6 @@ class ReservationRequest {
   // ===== Demandeur =====
   final String requesterNom;
   final String requesterPrenom;
-  final String requesterNationalite;
   final String requesterTelephone;
 
   // ===== Bénéficiaire =====
@@ -29,7 +28,6 @@ class ReservationRequest {
 
     required this.requesterNom,
     required this.requesterPrenom,
-    required this.requesterNationalite,
     required this.requesterTelephone,
 
     this.beneficiaryNom,
@@ -51,7 +49,6 @@ class ReservationRequest {
       // ===== Demandeur =====
       "nom": requesterNom,
       "prenom": requesterPrenom,
-      "nationalite": requesterNationalite,
       "telephone": requesterTelephone,
 
       // ===== Défunt (optionnel) =====

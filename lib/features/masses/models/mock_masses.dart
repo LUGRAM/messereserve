@@ -62,7 +62,7 @@ final List<MassModel> mockMasses = [
     subtitle: "Vœux & prières",
     imageAsset: "assets/images/masses/intention.jpg",
     heroTag: "messe_intention",
-    accentColor: const Color(0xFF670faf),
+    accentColor: const Color(0xFF702963),
     lottieAsset: "assets/lottie/pray.json",
     requiresBeneficiary: true,
   ),

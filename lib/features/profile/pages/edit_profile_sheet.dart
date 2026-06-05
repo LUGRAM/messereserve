@@ -280,6 +280,12 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                                   setState(() => _obscurePassword = !_obscurePassword),
                             ),
                           ),
+                          validator: (v) {
+                            if (v != null && v.isNotEmpty && v.length < 8) {
+                              return "Le mot de passe doit faire au moins 8 caractères";
+                            }
+                            return null;
+                          },
                           style: const TextStyle(color: AppColors.textPrimary2),
                         ),
                       ),

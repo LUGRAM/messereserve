@@ -112,7 +112,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     icon: Icons.lock_outline,
                     obscure: true,
                     controller: _passCtrl,
-                    maxLength: 8,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Mot de passe requis';
+                      if (v.length < 8) return 'Minimum 8 caractères';
+                      return null;
+                    },
                   ),
 
                   const SizedBox(height: 16),
@@ -122,9 +126,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     icon: Icons.check_circle_outline,
                     obscure: true,
                     controller: _confirmCtrl,
-                    maxLength: 8,
-                    validator: (v) =>
-                    v != _passCtrl.text ? 'Non conforme' : null,
+                    validator: (v) {
+                      if (v != _passCtrl.text) return 'Non conforme';
+                      return null;
+                    },
                   ),
 
                   const SizedBox(height: 24),

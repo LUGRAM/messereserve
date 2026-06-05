@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                     icon: Icons.lock_outline,
                     obscure: true,
                     controller: _passwordCtrl,
-                    maxLength: 8,
+                    validator: (v) => (v == null || v.isEmpty) ? 'Mot de passe requis' : null,
                   ),
 
                   const SizedBox(height: 24),

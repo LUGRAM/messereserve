@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:messeconnect/app/widgets/app_text_field.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../app/widgets/network_error_content.dart';
@@ -62,6 +63,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
   final _benefNomCtrl = TextEditingController();
   final _benefPrenomCtrl = TextEditingController();
   DateTime? _benefDateDeces;
+  final _txtIntentionCtrl = TextEditingController();
 
   // --- LOGIQUE INTENTIONS ---
   final List<String> _intentionsList = [
@@ -233,7 +235,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           children: [
-            const Text("Liste des pasteurs", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary2)),
+            const Text("Liste des prêtres", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary2)),
             const SizedBox(height: 16),
             ..._pastorCtrl.pastors.map((pastor) => ListTile(
               leading: const CircleAvatar(backgroundColor: Color(0xff8b8b89), foregroundColor: Colors.white, child: Icon(FontAwesomeIcons.userTie)),
@@ -357,7 +359,7 @@ class _MassStepperFormState extends State<MassStepperForm> {
               child: Row(children: [
                 const FaIcon(FontAwesomeIcons.userTie, color: Colors.white70, size: 20),
                 const SizedBox(width: 15),
-                Expanded(child: Text(_selectedPastor?.nom ?? "Choisir un pasteur (optionnel)", style: const TextStyle(color: Colors.white, fontSize: 16), overflow: TextOverflow.ellipsis)),
+                Expanded(child: Text(_selectedPastor?.nom ?? "Choisir un prêtre (optionnel)", style: const TextStyle(color: Colors.white, fontSize: 16), overflow: TextOverflow.ellipsis)),
               ]),
             ),
           ),
@@ -399,7 +401,9 @@ class _MassStepperFormState extends State<MassStepperForm> {
 
   Widget _buildStep2() {
     final bool isRequiem = widget.id.toLowerCase().contains("requiem");
+    final bool isIntention = widget.id.toLowerCase().contains("intention");
     if (!widget.requiresBeneficiary) return const Center(child: Text("Pas d'informations supplémentaires requises", style: TextStyle(color: Colors.white)));
+
     
     return Column(
       children: [
@@ -407,6 +411,16 @@ class _MassStepperFormState extends State<MassStepperForm> {
         _fieldContainer(child: TextFormField(controller: _benefPrenomCtrl, decoration: _input(isRequiem ? "Prénom du défunt" : "Prénom du bénéficiaire"), style: const TextStyle(color: Colors.white))),
         if (isRequiem)
           _fieldContainer(child: InkWell(onTap: _pickDateDeces, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15), child: Text(_benefDateDeces == null ? "Date du décès" : "${_benefDateDeces!.day}/${_benefDateDeces!.month}/${_benefDateDeces!.year}", style: const TextStyle(color: Colors.white))))),
+        if (isIntention) ...[
+          _fieldContainer(
+            child: AppTextField(
+              hint: 'Adresse un mot',
+              icon: FontAwesomeIcons.message,
+              obscure: true,
+              controller: _txtIntentionCtrl,
+            ),
+          )
+        ],
       ],
     );
   }
@@ -425,7 +439,11 @@ class _MassStepperFormState extends State<MassStepperForm> {
         _summaryRow("Heure", formatTime(_dateTime)),
         _summaryRow("Chorale", _withChoir ? "Avec" : "Sans", icon: Icons.music_note),
         if (isIntention) _summaryRow("Intention", (_selectedIntention == "Autre intention particulière" ? _benefNomCtrl.text : _selectedIntention) ?? "—", icon: Icons.auto_awesome),
-        const Divider(color: Colors.white24, height: 24),
+        const Divider(color: Colors.white24, height: 18),
+        if (isIntention) ...[
+          _summaryRow("Mots adressés", "${_txtIntentionCtrl.text}"),
+          const Divider(color: Colors.white24, height: 24),
+        ],
         _summaryRow("Demandeur", "${_nomCtrl.text} ${_prenomCtrl.text}"),
         _summaryRow("Téléphone", _telephoneCtrl.text),
         if (!isIntention && widget.requiresBeneficiary) ...[

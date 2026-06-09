@@ -51,7 +51,7 @@ class ReservationModel {
       time: json['heure_messe'] ?? '',
       status: json['statut'] ?? 'en_attente_paiement',
 
-      // Logique demandée pour le Pasteur
+      // Logique demandée pour le prêtre
       pastorName: pretre != null
           ? "${pretre['nom'] ?? ''} ${pretre['prenom'] ?? ''}".trim()
           : "Non précisé",

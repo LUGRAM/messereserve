@@ -18,7 +18,7 @@ class PastorSelector extends StatelessWidget {
         }
 
         if (ctrl.pastors.isEmpty) {
-          return const Center(child: Text("Aucun pasteur trouvé"));
+          return const Center(child: Text("Aucun prêtre trouvé"));
         }
 
         return ListView.builder(

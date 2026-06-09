@@ -305,7 +305,7 @@ class ReservationDetailPage extends StatelessWidget {
                     _buildInfoRow(
                         "Paroisse", r.paroisseName ?? "Non précisée"),
                     _buildInfoRow(
-                        "Pasteur", r.pastorName ?? "Non précisé"),
+                        "prêtre", r.pastorName ?? "Non précisé"),
 
                     // Statut spécifique
                     _buildStatusRow(r),

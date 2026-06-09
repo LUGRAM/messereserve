@@ -202,7 +202,7 @@ class ReservationSentPage extends StatelessWidget {
           _rowDark("Heure", time),
           _rowDark("Paroisse", paroisseName),
           if (pastorName != null)
-            _rowDark("Pasteur", pastorName!),
+            _rowDark("prêtre", pastorName!),
 
           const SizedBox(height: 16),
 

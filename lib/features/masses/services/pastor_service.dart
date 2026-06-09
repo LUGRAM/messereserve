@@ -14,7 +14,7 @@ class PastorService {
 
       return data.map((e) => PastorModel.fromJson(e)).toList();
     } on DioException catch (e) {
-      throw Exception(e.response?.data["message"] ?? "Erreur API pasteurs");
+      throw Exception(e.response?.data["message"] ?? "Erreur API prêtres");
     }
   }
 }
